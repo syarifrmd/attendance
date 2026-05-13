@@ -29,18 +29,19 @@ export default defineConfig({
             formVariants: true,
         }),
         VitePWA({
+            base: '/',
+            buildBase: '/build/',
+            outDir: 'public',
             registerType: 'autoUpdate',
             includeAssets: [
                 'favicon.ico',
                 'favicon.svg',
                 'apple-touch-icon.png',
-                'images/icon.png',
             ],
             manifest: {
                 name: 'Intern Attendance',
                 short_name: 'Attendance',
-                description:
-                    'Sistem Absensi Magang — PWA Mobile-First',
+                description: 'Sistem Absensi Magang — PWA Mobile-First',
                 theme_color: '#6366f1',
                 background_color: '#f9fafb',
                 display: 'standalone',
@@ -49,18 +50,18 @@ export default defineConfig({
                 start_url: '/',
                 icons: [
                     {
-                        src: 'images/icon.png',
+                        src: '/images/icon.png',
                         sizes: '512x512',
                         type: 'image/png',
                     },
                     {
-                        src: 'images/icon.png',
+                        src: '/images/icon.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'maskable',
                     },
                     {
-                        src: 'images/icon.png',
+                        src: '/images/icon.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
