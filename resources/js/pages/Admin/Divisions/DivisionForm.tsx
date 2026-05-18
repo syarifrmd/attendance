@@ -21,7 +21,6 @@ export type DivisionFormValues = {
     start_time?: string;
     end_time?: string;
     work_days?: string[];
-    internship_duration_days?: number;
     mentor_name?: string | null;
 };
 
@@ -112,18 +111,6 @@ export default function DivisionForm({
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="internship_duration_days">Durasi magang (hari)</Label>
-                            <Input
-                                id="internship_duration_days"
-                                name="internship_duration_days"
-                                type="number"
-                                min={1}
-                                defaultValue={values?.internship_duration_days ?? 90}
-                                required
-                            />
-                            <InputError message={errors.internship_duration_days} />
-                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="mentor_name">Nama mentor (opsional)</Label>
                             <Input

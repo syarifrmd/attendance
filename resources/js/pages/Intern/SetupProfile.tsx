@@ -23,8 +23,12 @@ const getDetectorOptions = () => {
 
 export default function SetupProfile({
     divisionName,
+    existingProfile,
+    userName,
 }: {
     divisionName?: string | null;
+    existingProfile?: any;
+    userName?: string;
 }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -43,9 +47,10 @@ export default function SetupProfile({
         foto: null as File | null,
         foto_left: null as File | null,
         foto_right: null as File | null,
-        nama_lengkap: '',
-        asal_kampus: '',
-        divisi: divisionName ?? '',
+        nama_lengkap: existingProfile?.nama_lengkap || userName || '',
+        asal_kampus: existingProfile?.asal_kampus || '',
+        divisi: existingProfile?.division?.name || existingProfile?.divisi || divisionName || '',
+        internship_duration_days: existingProfile?.internship_duration_days || 90,
     });
     const captureCount = [data.foto, data.foto_left, data.foto_right].filter(Boolean).length;
     const captureComplete = captureCount === 3;
@@ -639,6 +644,26 @@ export default function SetupProfile({
                     {errors.divisi && (
                         <p className="mt-1 text-xs text-red-500">
                             {errors.divisi}
+                        </p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                        Durasi Magang (Hari)
+                    </label>
+                    <input
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={data.internship_duration_days}
+                        onChange={(e) => setData('internship_duration_days', parseInt(e.target.value) || 0)}
+                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="Contoh: 90"
+                    />
+                    {errors.internship_duration_days && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.internship_duration_days}
                         </p>
                     )}
                 </div>

@@ -12,8 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('profiles', function (Blueprint $table) {
-            $table->string('foto_left')->nullable()->after('foto');
-            $table->string('foto_right')->nullable()->after('foto_left');
+            $table->integer('internship_duration_days')->default(90)->after('periode_magang');
+        });
+
+        Schema::table('divisions', function (Blueprint $table) {
+            $table->dropColumn('internship_duration_days');
         });
     }
 
@@ -22,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('divisions', function (Blueprint $table) {
+            $table->integer('internship_duration_days')->default(90)->after('work_days');
+        });
+
         Schema::table('profiles', function (Blueprint $table) {
-            $table->dropColumn(['foto_left', 'foto_right']);
+            $table->dropColumn('internship_duration_days');
         });
     }
 };

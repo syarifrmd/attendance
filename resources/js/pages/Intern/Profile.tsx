@@ -7,6 +7,7 @@ interface ProfileData {
     nama_lengkap: string;
     asal_kampus?: string;
     divisi?: string;
+    internship_duration_days?: number;
     division?: {
         name: string;
     };
@@ -38,7 +39,7 @@ export default function Profile({ user }: { user: UserData }) {
                         alt="Profile"
                         className="h-full w-full rounded-full border-4 border-white object-cover shadow-md"
                     />
-                    <Link href="/intern/setup-profile" className="absolute bottom-0 right-0 rounded-full border-2 border-white bg-indigo-600 p-1.5 text-white shadow-sm transition-transform hover:bg-indigo-700 active:scale-95">
+                    <Link href="/intern/profile/edit" className="absolute bottom-0 right-0 rounded-full border-2 border-white bg-indigo-600 p-1.5 text-white shadow-sm transition-transform hover:bg-indigo-700 active:scale-95">
                         <Edit3 size={14} />
                     </Link>
                 </div>
@@ -101,6 +102,18 @@ export default function Profile({ user }: { user: UserData }) {
                                 <p className="text-xs text-gray-500">Divisi Penempatan</p>
                                 <p className="text-sm font-medium text-gray-900">
                                     {profile?.division?.name || profile?.divisi || '-'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                                <div className="font-bold text-xs">90</div>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500">Durasi Magang (Hari)</p>
+                                <p className="text-sm font-medium text-gray-900">
+                                    {profile?.internship_duration_days || '-'} Hari
                                 </p>
                             </div>
                         </div>

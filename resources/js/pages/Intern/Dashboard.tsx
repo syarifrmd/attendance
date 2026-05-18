@@ -56,7 +56,6 @@ export default function Dashboard({
                 <div className="mb-6 flex items-center gap-3">
                     <img
                         src={
-                            auth.user.profile?.foto ||
                             `https://ui-avatars.com/api/?name=${auth.user.name}&background=random`
                         }
                         alt="Profile"

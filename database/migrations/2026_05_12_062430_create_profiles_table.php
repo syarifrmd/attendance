@@ -15,6 +15,8 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
             $table->string('foto')->nullable();
+            $table->string('foto_left')->nullable();
+            $table->string('foto_right')->nullable();
             $table->string('nama_lengkap');
             $table->string('asal_kampus')->nullable();
             $table->string('divisi')->nullable();

@@ -1,5 +1,5 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import MentorLayout from '@/layouts/MentorLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
+import ManagerLayout from '@/layouts/ManagerLayout';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,8 +27,7 @@ interface Division {
 }
 
 export default function DivisionEdit({ division }: { division: Division }) {
-    const { url } = usePage();
-    const prefix = url.startsWith('/admin') ? '/admin' : '/mentor';
+    const prefix = '/mentor';
 
     const { data, setData, put, processing, errors } = useForm({
         name: division.name ?? '',
@@ -52,7 +51,7 @@ export default function DivisionEdit({ division }: { division: Division }) {
     };
 
     return (
-        <MentorLayout title="Edit Divisi">
+        <ManagerLayout title="Edit Divisi">
             <Head title="Edit Divisi" />
 
             <div className="mb-6 flex items-center justify-between">
@@ -176,6 +175,6 @@ export default function DivisionEdit({ division }: { division: Division }) {
                     </div>
                 </form>
             </div>
-        </MentorLayout>
+        </ManagerLayout>
     );
 }

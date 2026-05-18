@@ -25,15 +25,17 @@ class AttendanceRequest extends FormRequest
         return [
             'status' => ['required', 'in:wfo,wfh,wfa,izin,sakit'],
 
-            // Required for WFO/WFH/WFA
-            'latitude' => ['required_if:status,wfo,wfh,wfa', 'nullable', 'string'],
-            'longitude' => ['required_if:status,wfo,wfh,wfa', 'nullable', 'string'],
-            'face_verification_image' => ['required_if:status,wfo,wfh,wfa', 'nullable', 'image', 'max:2048'],
+            // GPS & face verification only required for WFO
+            'latitude' => ['required_if:status,wfo', 'nullable', 'string'],
+            'longitude' => ['required_if:status,wfo', 'nullable', 'string'],
+            'face_verification_image' => ['required_if:status,wfo', 'nullable', 'image', 'max:2048'],
             'face_match_score' => ['nullable', 'numeric', 'min:0', 'max:1'],
 
-            // Required for Izin/Sakit
+            // Reason required for all except WFO
+            'reason' => ['required_if:status,wfh,wfa,izin,sakit', 'nullable', 'string', 'max:500'],
+
+            // Proof photo: required for izin/sakit, optional for wfh/wfa
             'proof_image' => ['required_if:status,izin,sakit', 'nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'reason' => ['required_if:status,izin,sakit', 'nullable', 'string', 'max:500'],
         ];
     }
 }

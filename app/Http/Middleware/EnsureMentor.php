@@ -6,18 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Restrict access to users with manager-level roles (mentor or admin).
+ */
 class EnsureMentor
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 
-        if (! $user || $user->role !== 'mentor') {
+        if (! $user || ! $user->isManager()) {
             abort(403);
         }
 

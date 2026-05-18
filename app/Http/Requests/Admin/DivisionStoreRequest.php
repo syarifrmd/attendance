@@ -33,7 +33,6 @@ class DivisionStoreRequest extends FormRequest
                 'string',
                 Rule::in(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
             ],
-            'internship_duration_days' => ['required', 'integer', 'min:1', 'max:3650'],
             'mentor_name' => ['nullable', 'string', 'max:255'],
         ];
     }

@@ -9,6 +9,19 @@ const MODEL_URL = '/models';
 const FACE_MATCH_THRESHOLD = 0.45;
 const FACE_AVG_THRESHOLD = 0.55;
 
+// Indosat Semarang office coordinates & radius
+const WFO_LAT = -6.98979;
+const WFO_LNG = 110.42133;
+const WFO_RADIUS_M = 100;
+
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371000;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 const getDetectorOptions = () => {
     if (faceapi.nets.ssdMobilenetv1.isLoaded) {
         return new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
@@ -34,6 +47,9 @@ interface TodayAttendance {
     status: string;
     check_in_at: string | null;
     check_out_at: string | null;
+    is_late?: boolean;
+    late_level?: 'green' | 'yellow' | 'red';
+    late_minutes?: number;
 }
 
 interface WorkSchedule {
@@ -61,7 +77,8 @@ export default function AttendanceForm({
     const [baselineDescriptors, setBaselineDescriptors] = useState<Float32Array[]>([]);
 
     // UI states
-    const [activeTab, setActiveTab] = useState<'onsite' | 'offsite'>('onsite');
+    const [activeTab, setActiveTab] = useState<'wfo' | 'wfhwfa' | 'offsite'>('wfo');
+    const [geoError, setGeoError] = useState<string | null>(null);
     const [locationStatus, setLocationStatus] = useState<
         'pending' | 'locating' | 'success' | 'error'
     >('pending');
@@ -78,6 +95,7 @@ export default function AttendanceForm({
         face_match_score: '',
         proof_image: null as File | null,
         reason: '',
+        checkout_reason: '',
     });
 
     const getDescriptorFromPath = useCallback(async (path: string) => {
@@ -242,6 +260,7 @@ export default function AttendanceForm({
 
     const getLocation = useCallback(() => {
         setLocationStatus('locating');
+        setGeoError(null);
         if (!navigator.geolocation) {
             setLocationStatus('error');
             toast.error('Geolocation tidak didukung di browser ini.');
@@ -250,11 +269,21 @@ export default function AttendanceForm({
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                setData((prev) => ({
-                    ...prev,
-                    latitude: position.coords.latitude.toString(),
-                    longitude: position.coords.longitude.toString(),
-                }));
+                const { latitude, longitude } = position.coords;
+                setData((prev) => ({ ...prev, latitude: latitude.toString(), longitude: longitude.toString() }));
+
+                if (activeTab === 'wfo') {
+                    const dist = haversineDistance(latitude, longitude, WFO_LAT, WFO_LNG);
+                    if (dist > WFO_RADIUS_M) {
+                        setLocationStatus('error');
+                        const msg = `Anda berada ${Math.round(dist)} m dari kantor. WFO hanya bisa dalam radius ${WFO_RADIUS_M} m.`;
+                        setGeoError(msg);
+                        toast.error(msg);
+                        setData((prev) => ({ ...prev, latitude: '', longitude: '' }));
+                        return;
+                    }
+                }
+
                 setLocationStatus('success');
                 toast.success('Lokasi berhasil didapatkan.');
             },
@@ -264,7 +293,7 @@ export default function AttendanceForm({
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
         );
-    }, [setData]);
+    }, [setData, activeTab]);
 
     const handleCaptureFace = useCallback(async () => {
         if (!videoRef.current || !modelsLoaded) {
@@ -420,27 +449,23 @@ export default function AttendanceForm({
     const submitAttendance = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (
-            activeTab === 'onsite' &&
-            (!data.latitude || !data.face_verification_image)
-        ) {
-            toast.error(
-                'Lokasi GPS dan Verifikasi Wajah wajib untuk presensi On-Site.',
-            );
+        if (activeTab === 'wfo' && (!data.latitude || !data.face_verification_image)) {
+            toast.error('Lokasi GPS dan Verifikasi Wajah wajib untuk WFO.');
+            return;
+        }
+
+        if (activeTab === 'wfhwfa' && !data.reason) {
+            toast.error('Alasan wajib untuk WFH/WFA.');
             return;
         }
 
         if (activeTab === 'offsite' && (!data.proof_image || !data.reason)) {
-            toast.error(
-                'Foto Bukti dan Alasan wajib untuk presensi Izin/Sakit.',
-            );
+            toast.error('Foto Bukti dan Alasan wajib untuk Izin/Sakit.');
             return;
         }
 
         post('/intern/attendance/store', {
-            onSuccess: () => {
-                toast.success('Absensi berhasil disimpan!');
-            },
+            onSuccess: () => { toast.success('Absensi berhasil disimpan!'); },
         });
     };
 
@@ -473,22 +498,153 @@ export default function AttendanceForm({
         const interval = setInterval(updateCountdown, 30000);
         return () => clearInterval(interval);
     }, [work_schedule?.end_time]);
+    const handleCheckOut = (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const handleCheckOut = () => {
-        if (!today_attendance) return;
-        if (!canCheckOut) {
-            toast.error(`Presensi pulang belum dapat dilakukan. Tersisa ${minutesUntilEnd} menit lagi.`);
+        if (today_attendance?.status === 'wfo' && (!data.latitude || !data.face_verification_image)) {
+            toast.error('Lokasi GPS dan Verifikasi Wajah wajib untuk presensi pulang WFO.');
             return;
         }
-        router.post(
-            `/intern/attendance/${today_attendance.id}/checkout`,
-            {},
-            {
-                onSuccess: () => toast.success('Presensi pulang berhasil!'),
-                onError: () => toast.error('Gagal melakukan presensi pulang.'),
-            },
-        );
+
+        if (!canCheckOut && !data.checkout_reason) {
+            toast.error('Alasan Pulang Awal wajib diisi.');
+            return;
+        }
+
+        post(`/intern/attendance/${today_attendance?.id}/checkout`, {
+            onSuccess: () => toast.success('Presensi pulang berhasil!'),
+            onError: () => toast.error('Gagal melakukan presensi pulang. Periksa input Anda.'),
+        });
     };
+
+    const renderWFORequirements = () => (
+        <>
+            {/* Geolocation Section */}
+            <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                    <div>
+                        <h3 className="text-sm font-semibold text-blue-900">
+                            Lokasi Saat Ini
+                        </h3>
+                        <p className="text-xs text-blue-700/70">
+                            Diperlukan untuk validasi area
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={getLocation}
+                        disabled={locationStatus === 'locating'}
+                        className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                    >
+                        {locationStatus === 'locating' ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : locationStatus === 'success' ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                        ) : (
+                            <MapPin className="h-4 w-4" />
+                        )}
+                        {locationStatus === 'success' ? 'Didapat' : 'Dapatkan'}
+                    </button>
+                </div>
+                {data.latitude && (
+                    <p className="rounded bg-blue-100 p-2 font-mono text-xs text-blue-800">
+                        Lat: {data.latitude.substring(0, 10)}
+                        <br />
+                        Lng: {data.longitude.substring(0, 10)}
+                    </p>
+                )}
+            </div>
+
+            {/* Face Verification Section */}
+            <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                    <div>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                            Verifikasi Wajah
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                            {!modelsLoaded && modelLoadProgress
+                                ? modelLoadProgress
+                                : modelsLoaded
+                                  ? baselineDescriptors.length > 0
+                                      ? 'Model AI siap digunakan.'
+                                      : 'Foto profil wajah belum tersedia.'
+                                  : 'Menunggu model AI...'}
+                        </p>
+                    </div>
+                    {!stream && !data.face_verification_image && (
+                        <button
+                            type="button"
+                            onClick={() => startCamera()}
+                            disabled={!modelsLoaded}
+                            className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 disabled:opacity-50"
+                        >
+                            Buka Kamera
+                        </button>
+                    )}
+                </div>
+
+                {/* Camera View */}
+                {stream && !data.face_verification_image && (
+                    <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-[4/3] shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+                        <canvas ref={overlayRef} className="absolute inset-0 h-full w-full object-cover pointer-events-none" />
+                        <div className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-200 ${flashEffect ? 'opacity-90' : 'opacity-0'}`} />
+                        <div className="pointer-events-none absolute inset-0 ring-4 ring-white/20 ring-inset rounded-lg" />
+                        
+                        {cameras.length > 0 && (
+                            <div className="absolute top-2 right-2 left-2 z-10">
+                                <select value={selectedCameraId} onChange={handleCameraChange} className="w-full rounded-lg border-none bg-black/50 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm focus:ring-2 focus:ring-white/50 appearance-none">
+                                    {cameras.map((cam, idx) => (
+                                        <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900">
+                                            {cam.label || `Camera ${idx + 1}`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="absolute inset-x-0 bottom-4 flex justify-center">
+                            <button
+                                type="button"
+                                onClick={handleCaptureFace}
+                                disabled={isDetecting || !modelsLoaded}
+                                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-indigo-600 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
+                            >
+                                {isDetecting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+                                Scan Wajah
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success state */}
+                {data.face_verification_image && (
+                    <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
+                        <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600" />
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-green-800">
+                                Wajah Terverifikasi
+                            </p>
+                            <p className="text-xs text-green-600">
+                                Foto wajah berhasil diambil.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setData('face_verification_image', null);
+                                startCamera();
+                            }}
+                            className="text-xs font-medium text-green-700 underline"
+                        >
+                            Ulangi
+                        </button>
+                    </div>
+                )}
+            </div>
+        </>
+    );
 
     return (
         <MobileLayout title="Presensi">
@@ -546,40 +702,64 @@ export default function AttendanceForm({
                             </>
                         )}
                     </div>
-                    <p className="mb-4 text-xs text-emerald-600">
-                        Status:{' '}
-                        <span className="font-bold uppercase">{today_attendance.status}</span>
+                    <p className="mb-4 text-xs text-emerald-600 flex items-center gap-2">
+                        <span>Status Kehadiran: <span className="font-bold uppercase">{today_attendance.status}</span></span>
+                        {today_attendance.is_late !== undefined && (
+                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                                today_attendance.late_level === 'green' ? 'bg-green-100 text-green-700' :
+                                today_attendance.late_level === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                                {today_attendance.late_level === 'green' ? 'Tepat Waktu' : `Terlambat ${today_attendance.late_minutes}m`}
+                            </span>
+                        )}
                     </p>
                     {!today_attendance.check_out_at ? (
-                        <div className="space-y-3">
-                            {/* Warning: not yet time */}
+                        <form onSubmit={handleCheckOut} className="space-y-4">
+                            {today_attendance.status === 'wfo' && renderWFORequirements()}
+                            
                             {!canCheckOut && minutesUntilEnd !== null && minutesUntilEnd > 0 && (
-                                <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
-                                    <div className="text-xs text-amber-700">
-                                        <p className="font-semibold">Belum waktunya pulang</p>
-                                        <p>
-                                            Presensi pulang baru bisa dilakukan pukul{' '}
-                                            <strong>{work_schedule?.end_time}</strong>.
-                                            Sisa <strong>{minutesUntilEnd} menit</strong> lagi.
-                                        </p>
+                                <div className="space-y-3">
+                                    <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                                        <div className="text-xs text-amber-700">
+                                            <p className="font-semibold">Belum waktunya pulang</p>
+                                            <p>
+                                                Presensi pulang normal baru bisa dilakukan pukul{' '}
+                                                <strong>{work_schedule?.end_time}</strong>.
+                                                Sisa <strong>{minutesUntilEnd} menit</strong> lagi.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                                            Alasan Pulang Awal (Wajib)
+                                        </label>
+                                        <textarea
+                                            value={data.checkout_reason}
+                                            onChange={(e) => setData('checkout_reason', e.target.value)}
+                                            rows={2}
+                                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                            placeholder="Jelaskan alasan pulang lebih awal..."
+                                        />
+                                        {errors.checkout_reason && <p className="mt-1 text-xs text-red-500">{errors.checkout_reason}</p>}
                                     </div>
                                 </div>
                             )}
+
                             <button
-                                type="button"
-                                onClick={handleCheckOut}
-                                disabled={!canCheckOut}
+                                type="submit"
+                                disabled={processing}
                                 className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold text-white shadow-md transition-transform active:scale-[0.98] ${
-                                    canCheckOut
+                                    canCheckOut || data.checkout_reason.trim().length > 0
                                         ? 'bg-emerald-600 shadow-emerald-200 hover:bg-emerald-700'
                                         : 'cursor-not-allowed bg-gray-400 shadow-gray-200'
                                 }`}
                             >
-                                <LogOut className="h-5 w-5" />
-                                {canCheckOut ? 'Presensi Pulang' : `Tunggu ${minutesUntilEnd ?? '...'} menit lagi`}
+                                {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogOut className="h-5 w-5" />}
+                                {canCheckOut ? 'Presensi Pulang' : 'Pulang Lebih Awal'}
                             </button>
-                        </div>
+                        </form>
                     ) : (
                         <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-100 py-3 text-sm font-semibold text-emerald-700">
                             <CheckCircle2 className="h-5 w-5" />
@@ -604,34 +784,18 @@ export default function AttendanceForm({
             {!today_attendance && (
                 <>
 
-            {/* Toggle Tabs */}
+            {/* Toggle Tabs - 3 tabs */}
             <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
-                <button
-                    type="button"
-                    onClick={() => {
-                        setActiveTab('onsite');
-                        setData('status', 'wfo');
-                    }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                        activeTab === 'onsite'
-                            ? 'bg-white text-indigo-600 shadow-sm'
-                            : 'text-gray-500'
-                    }`}
-                >
-                    Kerja (WFO/WFH)
+                <button type="button" onClick={() => { setActiveTab('wfo'); setData((p) => ({ ...p, status: 'wfo', latitude: '', longitude: '', face_verification_image: null, reason: '', proof_image: null })); setLocationStatus('pending'); setGeoError(null); }}
+                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'wfo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
+                    WFO
                 </button>
-                <button
-                    type="button"
-                    onClick={() => {
-                        setActiveTab('offsite');
-                        setData('status', 'izin');
-                    }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                        activeTab === 'offsite'
-                            ? 'bg-white text-indigo-600 shadow-sm'
-                            : 'text-gray-500'
-                    }`}
-                >
+                <button type="button" onClick={() => { setActiveTab('wfhwfa'); setData((p) => ({ ...p, status: 'wfh', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
+                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'wfhwfa' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
+                    WFH / WFA
+                </button>
+                <button type="button" onClick={() => { setActiveTab('offsite'); setData((p) => ({ ...p, status: 'izin', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
+                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'offsite' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
                     Izin / Sakit
                 </button>
             </div>
@@ -645,21 +809,17 @@ export default function AttendanceForm({
                     <select
                         value={data.status}
                         onChange={(e) => setData('status', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        disabled={activeTab === 'wfo'}
+                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500"
                     >
-                        {activeTab === 'onsite' ? (
+                        {activeTab === 'wfo' && <option value="wfo">Work From Office (WFO)</option>}
+                        {activeTab === 'wfhwfa' && (
                             <>
-                                <option value="wfo">
-                                    Work From Office (WFO)
-                                </option>
-                                <option value="wfh">
-                                    Work From Home (WFH)
-                                </option>
-                                <option value="wfa">
-                                    Work From Anywhere (WFA)
-                                </option>
+                                <option value="wfh">Work From Home (WFH)</option>
+                                <option value="wfa">Work From Anywhere (WFA)</option>
                             </>
-                        ) : (
+                        )}
+                        {activeTab === 'offsite' && (
                             <>
                                 <option value="izin">Izin</option>
                                 <option value="sakit">Sakit</option>
@@ -673,166 +833,9 @@ export default function AttendanceForm({
                     )}
                 </div>
 
-                {activeTab === 'onsite' && (
-                    <>
-                        {/* Geolocation Section */}
-                        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-                            <div className="mb-3 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-sm font-semibold text-blue-900">
-                                        Lokasi Saat Ini
-                                    </h3>
-                                    <p className="text-xs text-blue-700/70">
-                                        Diperlukan untuk validasi area
-                                    </p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={getLocation}
-                                    disabled={locationStatus === 'locating'}
-                                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
-                                >
-                                    {locationStatus === 'locating' ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : locationStatus === 'success' ? (
-                                        <CheckCircle2 className="h-4 w-4" />
-                                    ) : (
-                                        <MapPin className="h-4 w-4" />
-                                    )}
-                                    {locationStatus === 'success'
-                                        ? 'Didapat'
-                                        : 'Dapatkan'}
-                                </button>
-                            </div>
-                            {data.latitude && (
-                                <p className="rounded bg-blue-100 p-2 font-mono text-xs text-blue-800">
-                                    Lat: {data.latitude.substring(0, 10)}
-                                    <br />
-                                    Lng: {data.longitude.substring(0, 10)}
-                                </p>
-                            )}
-                        </div>
+                {activeTab === 'wfo' && renderWFORequirements()}
 
-                        {/* Face Verification Section */}
-                        <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-4">
-                            <div className="mb-3 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-sm font-semibold text-gray-900">
-                                        Verifikasi Wajah
-                                    </h3>
-                                    <p className="text-xs text-gray-500">
-                                        {!modelsLoaded && modelLoadProgress
-                                            ? modelLoadProgress
-                                            : modelsLoaded
-                                              ? baselineDescriptors.length > 0
-                                                  ? 'Model AI siap digunakan.'
-                                                  : 'Foto profil wajah belum tersedia.'
-                                              : 'Menunggu model AI...'}
-                                    </p>
-                                </div>
-                                {!stream &&
-                                    !data.face_verification_image && (
-                                        <button
-                                            type="button"
-                                            onClick={() => startCamera()}
-                                            disabled={!modelsLoaded}
-                                            className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 disabled:opacity-50"
-                                        >
-                                            Buka Kamera
-                                        </button>
-                                    )}
-                            </div>
-
-                            {/* Camera View */}
-                            {stream && !data.face_verification_image && (
-                                <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-[4/3] shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                                    <video
-                                        ref={videoRef}
-                                        autoPlay
-                                        playsInline
-                                        muted
-                                        className="h-full w-full object-cover"
-                                    />
-                                    <canvas
-                                        ref={overlayRef}
-                                        className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-                                    />
-
-                                    {/* Cahaya Splash Overlay */}
-                                    <div className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-200 ${flashEffect ? 'opacity-90' : 'opacity-0'}`} />
-
-                                    {/* Light booster for dark environments */}
-                                    <div className="pointer-events-none absolute inset-0 ring-4 ring-white/20 ring-inset rounded-lg" />
-
-                                    {/* Camera Selector Dropdown */}
-                                    {cameras.length > 0 && (
-                                        <div className="absolute top-2 right-2 left-2 z-10">
-                                            <select
-                                                value={selectedCameraId}
-                                                onChange={handleCameraChange}
-                                                className="w-full rounded-lg border-none bg-black/50 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm focus:ring-2 focus:ring-white/50 appearance-none"
-                                            >
-                                                {cameras.map((cam, idx) => (
-                                                    <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900">
-                                                        {cam.label || `Camera ${idx + 1}`}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
-
-                                    <div className="absolute inset-x-0 bottom-4 flex justify-center">
-                                        <button
-                                            type="button"
-                                            onClick={handleCaptureFace}
-                                            disabled={
-                                                isDetecting || !modelsLoaded
-                                            }
-                                            className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-indigo-600 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
-                                        >
-                                            {isDetecting ? (
-                                                <Loader2 className="h-5 w-5 animate-spin" />
-                                            ) : (
-                                                <Camera className="h-5 w-5" />
-                                            )}
-                                            Scan Wajah
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Success state */}
-                            {data.face_verification_image && (
-                                <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
-                                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600" />
-                                    <div className="flex-1">
-                                        <p className="text-sm font-medium text-green-800">
-                                            Wajah Terverifikasi
-                                        </p>
-                                        <p className="text-xs text-green-600">
-                                            Foto wajah berhasil diambil.
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setData(
-                                                'face_verification_image',
-                                                null,
-                                            );
-                                            startCamera();
-                                        }}
-                                        className="text-xs font-medium text-green-700 underline"
-                                    >
-                                        Ulangi
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
-
-                {activeTab === 'offsite' && (
+                {(activeTab === 'wfhwfa' || activeTab === 'offsite') && (
                     <>
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -840,51 +843,30 @@ export default function AttendanceForm({
                             </label>
                             <textarea
                                 value={data.reason}
-                                onChange={(e) =>
-                                    setData('reason', e.target.value)
-                                }
+                                onChange={(e) => setData('reason', e.target.value)}
                                 rows={3}
                                 className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                placeholder="Jelaskan alasan izin / sakit..."
+                                placeholder={`Jelaskan alasan ${activeTab === 'offsite' ? 'izin / sakit' : 'WFH / WFA'}...`}
                             />
-                            {errors.reason && (
-                                <p className="mt-1 text-xs text-red-500">
-                                    {errors.reason}
-                                </p>
-                            )}
+                            {errors.reason && <p className="mt-1 text-xs text-red-500">{errors.reason}</p>}
                         </div>
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Bukti Foto / Surat Dokter (Wajib)
+                                {activeTab === 'offsite' ? 'Bukti Foto / Surat Dokter (Wajib)' : 'Foto Bukti (Opsional)'}
                             </label>
                             <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-gray-500">
                                 <UploadCloud className="mb-2 h-8 w-8" />
-                                <span className="text-sm">
-                                    Klik untuk upload foto
-                                </span>
+                                <span className="text-sm">Klik untuk upload foto</span>
                                 <input
                                     type="file"
                                     accept="image/jpeg,image/png,image/jpg"
-                                    onChange={(e) =>
-                                        setData(
-                                            'proof_image',
-                                            e.target.files?.[0] || null,
-                                        )
-                                    }
+                                    onChange={(e) => setData('proof_image', e.target.files?.[0] || null)}
                                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                                 />
                             </div>
-                            {data.proof_image && (
-                                <p className="mt-2 text-xs text-green-600">
-                                    File terpilih: {data.proof_image.name}
-                                </p>
-                            )}
-                            {errors.proof_image && (
-                                <p className="mt-1 text-xs text-red-500">
-                                    {errors.proof_image}
-                                </p>
-                            )}
+                            {data.proof_image && <p className="mt-2 text-xs text-green-600">File terpilih: {data.proof_image.name}</p>}
+                            {errors.proof_image && <p className="mt-1 text-xs text-red-500">{errors.proof_image}</p>}
                         </div>
                     </>
                 )}

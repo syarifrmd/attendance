@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -32,7 +32,24 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'role' => Role::class,
         ];
+    }
+
+    /**
+     * Determine if this user has manager-level access (mentor or admin).
+     */
+    public function isManager(): bool
+    {
+        return $this->role?->isManager() ?? false;
+    }
+
+    /**
+     * Determine if this user is an intern.
+     */
+    public function isIntern(): bool
+    {
+        return $this->role === Role::Intern;
     }
 
     public function profile(): HasOne

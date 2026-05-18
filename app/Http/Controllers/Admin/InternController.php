@@ -15,11 +15,31 @@ use Inertia\Response;
 class InternController extends Controller
 {
     /**
+     * Compute late metadata for a given attendance and its division.
+     *
+     * @return array{is_late: bool, late_minutes: int, late_level: string}
+     */
+    private function lateMeta(Attendance $att, ?Division $division): array
+    {
+        if (! $att->check_in_at || ! $division?->start_time) {
+            return ['is_late' => false, 'late_minutes' => 0, 'late_level' => 'green'];
+        }
+
+        $lateMinutes = $att->lateMinutes($division->start_time);
+        $lateLevel = $att->lateLevel($division->start_time);
+
+        return [
+            'is_late' => $lateMinutes > 0,
+            'late_minutes' => $lateMinutes,
+            'late_level' => $lateLevel,
+        ];
+    }
+
+    /**
      * Display a listing of all interns with their attendance for the selected date.
      */
     public function index(Request $request): Response
     {
-        // Default date = today
         $date = $request->filled('date')
             ? Carbon::parse($request->date)->startOfDay()
             : Carbon::today();
@@ -75,18 +95,9 @@ class InternController extends Controller
         $interns->getCollection()->transform(function (User $intern) use ($dateAttendances) {
             $att = $dateAttendances->get($intern->id);
             $division = $intern->profile?->division;
-            $isLate = false;
-            $noCheckout = false;
 
-            if ($att && $att->check_in_at && $division?->start_time) {
-                $startTime = Carbon::parse($division->start_time);
-                $scheduledStart = Carbon::parse($att->check_in_at)->startOfDay()->setTime($startTime->hour, $startTime->minute, 0);
-                $isLate = Carbon::parse($att->check_in_at)->greaterThan($scheduledStart);
-            }
-
-            if ($att && in_array($att->status, ['wfo', 'wfh', 'wfa']) && is_null($att->check_out_at)) {
-                $noCheckout = true;
-            }
+            $late = $att ? $this->lateMeta($att, $division) : ['is_late' => false, 'late_minutes' => 0, 'late_level' => 'green'];
+            $noCheckout = $att && in_array($att->status, ['wfo', 'wfh', 'wfa']) && is_null($att->check_out_at);
 
             $intern->today_attendance = $att ? [
                 'id' => $att->id,
@@ -95,14 +106,16 @@ class InternController extends Controller
                 'check_out_at' => $att->check_out_at?->toIso8601String(),
                 'reason' => $att->reason,
                 'proof_image_path' => $att->proof_image_path,
-                'is_late' => $isLate,
+                'is_late' => $late['is_late'],
+                'late_minutes' => $late['late_minutes'],
+                'late_level' => $late['late_level'],
                 'no_checkout' => $noCheckout,
             ] : null;
 
             return $intern;
         });
 
-        return Inertia::render('Admin/Interns/Index', [
+        return Inertia::render('Mentor/Interns/Index', [
             'interns' => $interns,
             'divisions' => Division::orderBy('name')->get(['id', 'name']),
             'filters' => $request->only(['search', 'division_id', 'today_status', 'date']),
@@ -115,7 +128,7 @@ class InternController extends Controller
      */
     public function show(Request $request, User $user): Response
     {
-        abort_if($user->role !== 'intern', 404);
+        abort_if($user->isManager() || $user->isIntern() === false, 404);
 
         $user->load('profile.division');
 
@@ -135,24 +148,19 @@ class InternController extends Controller
         $division = $user->profile?->division;
 
         $attendances->getCollection()->transform(function (Attendance $att) use ($division) {
-            $isLate = false;
-
-            if ($att->check_in_at && $division?->start_time) {
-                $startTime = Carbon::parse($division->start_time);
-                $dayStart = Carbon::parse($att->check_in_at)->startOfDay()->setTime($startTime->hour, $startTime->minute, 0);
-                $isLate = Carbon::parse($att->check_in_at)->greaterThan($dayStart);
-            }
-
+            $late = $this->lateMeta($att, $division);
             $noCheckout = in_array($att->status, ['wfo', 'wfh', 'wfa']) && is_null($att->check_out_at);
 
             return array_merge($att->toArray(), [
-                'is_late' => $isLate,
+                'is_late' => $late['is_late'],
+                'late_minutes' => $late['late_minutes'],
+                'late_level' => $late['late_level'],
                 'no_checkout' => $noCheckout,
                 'proof_image_url' => $att->proof_image_path ? asset('storage/'.$att->proof_image_path) : null,
             ]);
         });
 
-        return Inertia::render('Admin/Interns/Show', [
+        return Inertia::render('Mentor/Interns/Show', [
             'intern' => $user,
             'attendances' => $attendances,
             'division' => $division,
@@ -166,7 +174,7 @@ class InternController extends Controller
     }
 
     /**
-     * Update an attendance record (admin override).
+     * Update an attendance record (manager override).
      */
     public function updateAttendance(Request $request, Attendance $attendance): RedirectResponse
     {
@@ -183,7 +191,7 @@ class InternController extends Controller
     }
 
     /**
-     * Delete an attendance record (admin).
+     * Delete an attendance record.
      */
     public function destroyAttendance(Attendance $attendance): RedirectResponse
     {
@@ -193,7 +201,7 @@ class InternController extends Controller
     }
 
     /**
-     * Count how many times this intern was late.
+     * Count how many times this intern was late (with grace period).
      */
     private function countLateAttendances(User $user, ?Division $division): int
     {
@@ -205,12 +213,7 @@ class InternController extends Controller
             ->whereIn('status', ['wfo', 'wfh', 'wfa'])
             ->whereNotNull('check_in_at')
             ->get()
-            ->filter(function (Attendance $att) use ($division) {
-                $startTime = Carbon::parse($division->start_time);
-                $dayStart = Carbon::parse($att->check_in_at)->startOfDay()->setTime($startTime->hour, $startTime->minute, 0);
-
-                return Carbon::parse($att->check_in_at)->greaterThan($dayStart);
-            })
+            ->filter(fn (Attendance $att) => $att->lateMinutes($division->start_time) > 0)
             ->count();
     }
 }

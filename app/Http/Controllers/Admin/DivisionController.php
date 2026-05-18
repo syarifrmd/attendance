@@ -7,7 +7,6 @@ use App\Http\Requests\Admin\DivisionStoreRequest;
 use App\Http\Requests\Admin\DivisionUpdateRequest;
 use App\Models\Division;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,11 +15,9 @@ class DivisionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $prefix = $this->viewPrefix($request);
-
-        return Inertia::render("{$prefix}/Divisions/Index", [
+        return Inertia::render('Mentor/Divisions/Index', [
             'divisions' => Division::query()->orderBy('name')->get(),
         ]);
     }
@@ -28,38 +25,32 @@ class DivisionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request): Response
+    public function create(): Response
     {
-        $prefix = $this->viewPrefix($request);
-
-        return Inertia::render("{$prefix}/Divisions/Create");
+        return Inertia::render('Mentor/Divisions/Create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, DivisionStoreRequest $divisionRequest): RedirectResponse
+    public function store(DivisionStoreRequest $request): RedirectResponse
     {
-        Division::create($divisionRequest->validated());
+        Division::create($request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => __('Divisi berhasil ditambahkan.'),
         ]);
 
-        $routePrefix = str_starts_with($request->route()->getName(), 'admin.') ? 'admin' : 'mentor';
-
-        return to_route("{$routePrefix}.divisions.index");
+        return to_route('mentor.divisions.index');
     }
 
     /**
-     * Display the specified resource.
+     * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Division $division): Response
+    public function edit(Division $division): Response
     {
-        $prefix = $this->viewPrefix($request);
-
-        return Inertia::render("{$prefix}/Divisions/Edit", [
+        return Inertia::render('Mentor/Divisions/Edit', [
             'division' => $division,
         ]);
     }
@@ -67,24 +58,22 @@ class DivisionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, DivisionUpdateRequest $divisionRequest, Division $division): RedirectResponse
+    public function update(DivisionUpdateRequest $request, Division $division): RedirectResponse
     {
-        $division->update($divisionRequest->validated());
+        $division->update($request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => __('Divisi berhasil diperbarui.'),
         ]);
 
-        $routePrefix = str_starts_with($request->route()->getName(), 'admin.') ? 'admin' : 'mentor';
-
-        return to_route("{$routePrefix}.divisions.index");
+        return to_route('mentor.divisions.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Division $division): RedirectResponse
+    public function destroy(Division $division): RedirectResponse
     {
         $division->delete();
 
@@ -93,16 +82,6 @@ class DivisionController extends Controller
             'message' => __('Divisi berhasil dihapus.'),
         ]);
 
-        $routePrefix = str_starts_with($request->route()->getName(), 'admin.') ? 'admin' : 'mentor';
-
-        return to_route("{$routePrefix}.divisions.index");
-    }
-
-    /**
-     * Determine the Inertia view prefix based on the current route.
-     */
-    private function viewPrefix(Request $request): string
-    {
-        return str_starts_with((string) $request->route()->getName(), 'admin.') ? 'Admin' : 'Mentor';
+        return to_route('mentor.divisions.index');
     }
 }

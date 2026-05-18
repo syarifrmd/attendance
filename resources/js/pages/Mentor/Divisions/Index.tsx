@@ -1,5 +1,5 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import MentorLayout from '@/layouts/MentorLayout';
+import { Head, Link } from '@inertiajs/react';
+import ManagerLayout from '@/layouts/ManagerLayout';
 
 interface Division {
     id: string;
@@ -23,11 +23,10 @@ const dayLabels: Record<string, string> = {
 };
 
 export default function DivisionIndex({ divisions }: { divisions: Division[] }) {
-    const { url } = usePage();
-    const prefix = url.startsWith('/admin') ? '/admin' : '/mentor';
+    const prefix = '/mentor';
 
     return (
-        <MentorLayout title="Manajemen Divisi">
+        <ManagerLayout title="Manajemen Divisi">
             <Head title="Manajemen Divisi" />
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -119,6 +118,6 @@ export default function DivisionIndex({ divisions }: { divisions: Division[] }) 
                     </tbody>
                 </table>
             </div>
-        </MentorLayout>
+        </ManagerLayout>
     );
 }

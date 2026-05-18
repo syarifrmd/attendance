@@ -17,13 +17,13 @@ class CheckProfileSetup
     {
         $user = $request->user();
 
-        if ($user && $user->role === 'intern') {
+        if ($user && $user->role === \App\Enums\Role::Intern) {
             // Check if user has a profile and a photo
             $profile = $user->profile;
 
             // Allow them to visit the setup page without being caught in a redirect loop
             if (! $request->routeIs('intern.setup-profile') && ! $request->routeIs('intern.setup-profile.store') && ! $request->routeIs('logout')) {
-                if (! $profile || empty($profile->foto)) {
+                if (! $profile || empty($profile->foto) || empty($profile->foto_left) || empty($profile->foto_right)) {
                     return redirect()->route('intern.setup-profile');
                 }
             }

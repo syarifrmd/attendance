@@ -48,6 +48,9 @@ class AttendanceController extends Controller
                 'status' => $todayAttendance->status,
                 'check_in_at' => $todayAttendance->check_in_at?->toIso8601String(),
                 'check_out_at' => $todayAttendance->check_out_at?->toIso8601String(),
+                'is_late' => $division?->start_time ? $todayAttendance->lateMinutes($division->start_time) > 0 : false,
+                'late_level' => $division?->start_time ? $todayAttendance->lateLevel($division->start_time) : 'green',
+                'late_minutes' => $division?->start_time ? $todayAttendance->lateMinutes($division->start_time) : 0,
             ] : null,
             'work_schedule' => $workSchedule,
         ]);
@@ -109,19 +112,44 @@ class AttendanceController extends Controller
         $division = $user->profile?->division;
         $now = Carbon::now();
 
-        // Validate end time
+        // Validate early checkout reason
+        $isEarly = false;
         if ($division?->end_time) {
             $endTime = Carbon::parse($division->end_time);
             $scheduledEnd = Carbon::today()->setTime($endTime->hour, $endTime->minute, 0);
 
             if ($now->lessThan($scheduledEnd)) {
-                $endFormatted = $endTime->format('H:i');
-
-                return back()->withErrors(['checkout' => "Presensi pulang hanya dapat dilakukan setelah jam {$endFormatted}."]);
+                $isEarly = true;
+                if (! $request->filled('checkout_reason')) {
+                    $endFormatted = $endTime->format('H:i');
+                    return back()->withErrors(['checkout' => "Presensi pulang sebelum jam {$endFormatted} wajib menyertakan alasan (Alasan Pulang Awal)."]);
+                }
             }
         }
 
-        $attendance->update(['check_out_at' => $now]);
+        // Validate location and face verification for WFO
+        if ($attendance->status === 'wfo') {
+            $request->validate([
+                'latitude' => 'required|string',
+                'longitude' => 'required|string',
+                'face_verification_image' => 'required|image|max:5120',
+                'face_match_score' => 'required|numeric',
+                'checkout_reason' => 'nullable|string',
+            ]);
+        }
+
+        $checkout_face_path = null;
+        if ($request->hasFile('face_verification_image')) {
+            $checkout_face_path = $request->file('face_verification_image')->store('attendances/faces_checkout', 'public');
+        }
+
+        $attendance->update([
+            'check_out_at' => $now,
+            'checkout_latitude' => $request->input('latitude'),
+            'checkout_longitude' => $request->input('longitude'),
+            'checkout_face_verification_path' => $checkout_face_path,
+            'checkout_reason' => $request->input('checkout_reason'),
+        ]);
 
         return redirect()->route('intern.attendance.create');
     }

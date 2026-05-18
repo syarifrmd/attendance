@@ -1,5 +1,5 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import MentorLayout from '@/layouts/MentorLayout';
+import { Head, Link, useForm } from '@inertiajs/react';
+import ManagerLayout from '@/layouts/ManagerLayout';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,8 +16,7 @@ const dayOptions = [
 ];
 
 export default function DivisionCreate() {
-    const { url } = usePage();
-    const prefix = url.startsWith('/admin') ? '/admin' : '/mentor';
+    const prefix = '/mentor';
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -41,7 +40,7 @@ export default function DivisionCreate() {
     };
 
     return (
-        <MentorLayout title="Tambah Divisi">
+        <ManagerLayout title="Tambah Divisi">
             <Head title="Tambah Divisi" />
 
             <div className="mb-6 flex items-center justify-between">
@@ -167,6 +166,6 @@ export default function DivisionCreate() {
                     </div>
                 </form>
             </div>
-        </MentorLayout>
+        </ManagerLayout>
     );
 }
