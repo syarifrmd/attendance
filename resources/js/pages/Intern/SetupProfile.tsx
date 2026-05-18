@@ -21,7 +21,11 @@ const getDetectorOptions = () => {
     });
 };
 
-export default function SetupProfile() {
+export default function SetupProfile({
+    divisionName,
+}: {
+    divisionName?: string | null;
+}) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
@@ -41,7 +45,7 @@ export default function SetupProfile() {
         foto_right: null as File | null,
         nama_lengkap: '',
         asal_kampus: '',
-        divisi: '',
+        divisi: divisionName ?? '',
     });
     const captureCount = [data.foto, data.foto_left, data.foto_right].filter(Boolean).length;
     const captureComplete = captureCount === 3;
@@ -628,9 +632,9 @@ export default function SetupProfile() {
                     <input
                         type="text"
                         value={data.divisi}
-                        onChange={(e) => setData('divisi', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        placeholder="Contoh: IT Support, Web Developer"
+                        readOnly
+                        className="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-700 shadow-sm"
+                        placeholder="Divisi dari pendaftaran"
                     />
                     {errors.divisi && (
                         <p className="mt-1 text-xs text-red-500">

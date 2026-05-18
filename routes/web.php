@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\InternController as AdminInternController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\InternController;
 use App\Http\Controllers\MentorController;
@@ -17,6 +19,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         if (auth()->user()->role === 'mentor') {
             return redirect()->route('mentor.dashboard');
+        }
+
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.interns.index');
         }
 
         return redirect()->route('intern.dashboard');
@@ -39,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
             Route::post('attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+            Route::post('attendance/{attendance}/checkout', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
             Route::get('attendance/history', [InternController::class, 'history'])->name('attendance.history');
         });
     });
@@ -50,6 +57,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::prefix('mentor')->name('mentor.')->group(function () {
         Route::get('dashboard', [MentorController::class, 'dashboard'])->name('dashboard');
+        Route::resource('divisions', DivisionController::class)->except(['show'])
+            ->middleware('mentor');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+        Route::resource('divisions', DivisionController::class)->except(['show']);
+        Route::resource('interns', AdminInternController::class)->only(['index', 'show']);
+        Route::patch('attendances/{attendance}', [AdminInternController::class, 'updateAttendance'])->name('attendances.update');
+        Route::delete('attendances/{attendance}', [AdminInternController::class, 'destroyAttendance'])->name('attendances.destroy');
     });
 });
 

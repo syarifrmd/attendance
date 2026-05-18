@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Division;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -13,11 +14,14 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    $division = Division::factory()->create();
+
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'division_id' => $division->id,
     ]);
 
     $this->assertAuthenticated();

@@ -7,6 +7,9 @@ interface ProfileData {
     nama_lengkap: string;
     asal_kampus?: string;
     divisi?: string;
+    division?: {
+        name: string;
+    };
 }
 
 interface UserData {
@@ -43,7 +46,7 @@ export default function Profile({ user }: { user: UserData }) {
                     {profile?.nama_lengkap || user.name}
                 </h2>
                 <p className="text-sm font-medium text-indigo-600">
-                    {profile?.divisi || 'Intern'}
+                    {profile?.division?.name || profile?.divisi || 'Intern'}
                 </p>
             </div>
 
@@ -97,7 +100,7 @@ export default function Profile({ user }: { user: UserData }) {
                             <div>
                                 <p className="text-xs text-gray-500">Divisi Penempatan</p>
                                 <p className="text-sm font-medium text-gray-900">
-                                    {profile?.divisi || '-'}
+                                    {profile?.division?.name || profile?.divisi || '-'}
                                 </p>
                             </div>
                         </div>

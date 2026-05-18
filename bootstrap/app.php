@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\CheckProfileSetup;
+use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureMentor;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -24,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'admin' => EnsureAdmin::class,
+            'mentor' => EnsureMentor::class,
             'profile.setup' => CheckProfileSetup::class,
         ]);
     })

@@ -4,7 +4,9 @@ namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
+use App\Models\Division;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
@@ -21,13 +23,26 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
+            'division_id' => ['required', 'exists:divisions,id'],
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-        ]);
+        return DB::transaction(function () use ($input): User {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => $input['password'],
+            ]);
+
+            $division = Division::query()->select('id', 'name')->find($input['division_id']);
+
+            $user->profile()->create([
+                'division_id' => $division?->id,
+                'divisi' => $division?->name,
+                'nama_lengkap' => $input['name'],
+            ]);
+
+            return $user;
+        });
     }
 }

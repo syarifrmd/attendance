@@ -12,9 +12,13 @@ import { send } from '@/routes/verification';
 export default function Profile({
     mustVerifyEmail,
     status,
+    divisions,
+    profile,
 }: {
     mustVerifyEmail: boolean;
     status?: string;
+    divisions: { id: string; name: string }[];
+    profile?: { division_id?: string | null } | null;
 }) {
     const { auth } = usePage().props;
 
@@ -56,6 +60,29 @@ export default function Profile({
                                 <InputError
                                     className="mt-2"
                                     message={errors.name}
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="division_id">Divisi</Label>
+
+                                <select
+                                    id="division_id"
+                                    name="division_id"
+                                    defaultValue={profile?.division_id ?? ''}
+                                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base text-foreground shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                                >
+                                    <option value="">Pilih divisi</option>
+                                    {divisions.map((division) => (
+                                        <option key={division.id} value={division.id}>
+                                            {division.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.division_id}
                                 />
                             </div>
 

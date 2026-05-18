@@ -1,8 +1,8 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import MobileLayout from '@/layouts/MobileLayout';
 import toast, { Toaster } from 'react-hot-toast';
-import { Camera, MapPin, Loader2, UploadCloud, CheckCircle2, XCircle } from 'lucide-react';
+import { Camera, MapPin, Loader2, UploadCloud, CheckCircle2, XCircle, Clock, LogOut, AlertTriangle } from 'lucide-react';
 import * as faceapi from 'face-api.js';
 
 const MODEL_URL = '/models';
@@ -29,7 +29,28 @@ const loadImage = (src: string) =>
         img.src = src;
     });
 
-export default function AttendanceForm({ profile_faces = [] }: { profile_faces: string[] }) {
+interface TodayAttendance {
+    id: string;
+    status: string;
+    check_in_at: string | null;
+    check_out_at: string | null;
+}
+
+interface WorkSchedule {
+    start_time: string;
+    end_time: string;
+    work_days: string[];
+}
+
+export default function AttendanceForm({
+    profile_faces = [],
+    today_attendance = null,
+    work_schedule = null,
+}: {
+    profile_faces: string[];
+    today_attendance: TodayAttendance | null;
+    work_schedule: WorkSchedule | null;
+}) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
@@ -423,6 +444,52 @@ export default function AttendanceForm({ profile_faces = [] }: { profile_faces: 
         });
     };
 
+    // Check-out handler
+    const [minutesUntilEnd, setMinutesUntilEnd] = useState<number | null>(null);
+    const [canCheckOut, setCanCheckOut] = useState(false);
+
+    useEffect(() => {
+        if (!work_schedule?.end_time) {
+            setCanCheckOut(true);
+            return;
+        }
+
+        const updateCountdown = () => {
+            const now = new Date();
+            const [h, m] = work_schedule.end_time.split(':').map(Number);
+            const endDate = new Date();
+            endDate.setHours(h, m, 0, 0);
+            const diffMs = endDate.getTime() - now.getTime();
+            if (diffMs <= 0) {
+                setCanCheckOut(true);
+                setMinutesUntilEnd(0);
+            } else {
+                setCanCheckOut(false);
+                setMinutesUntilEnd(Math.ceil(diffMs / 60000));
+            }
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 30000);
+        return () => clearInterval(interval);
+    }, [work_schedule?.end_time]);
+
+    const handleCheckOut = () => {
+        if (!today_attendance) return;
+        if (!canCheckOut) {
+            toast.error(`Presensi pulang belum dapat dilakukan. Tersisa ${minutesUntilEnd} menit lagi.`);
+            return;
+        }
+        router.post(
+            `/intern/attendance/${today_attendance.id}/checkout`,
+            {},
+            {
+                onSuccess: () => toast.success('Presensi pulang berhasil!'),
+                onError: () => toast.error('Gagal melakukan presensi pulang.'),
+            },
+        );
+    };
+
     return (
         <MobileLayout title="Presensi">
             <Toaster position="top-center" />
@@ -434,6 +501,108 @@ export default function AttendanceForm({ profile_faces = [] }: { profile_faces: 
                     Pilih tipe kehadiran dan lengkapi data.
                 </p>
             </div>
+
+            {/* Work Schedule Info */}
+            {work_schedule && (
+                <div className="mb-4 flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3">
+                    <Clock className="h-4 w-4 text-indigo-500" />
+                    <div className="text-xs text-indigo-700">
+                        <span className="font-semibold">Jam Kerja:</span>{' '}
+                        {work_schedule.start_time} – {work_schedule.end_time}
+                        <span className="ml-2 text-indigo-400">
+                            (Presensi pulang setelah jam {work_schedule.end_time})
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {/* Already Checked In – Show Check-Out Panel */}
+            {today_attendance && ['wfo', 'wfh', 'wfa'].includes(today_attendance.status) && (
+                <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                    <div className="mb-3 flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        <h2 className="font-semibold text-emerald-800">Presensi Masuk Tercatat</h2>
+                    </div>
+                    <div className="mb-1 flex items-center gap-2 text-sm text-emerald-700">
+                        <Clock className="h-4 w-4" />
+                        <span>
+                            Masuk:{' '}
+                            <strong>
+                                {today_attendance.check_in_at
+                                    ? new Date(today_attendance.check_in_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                                    : '-'}
+                            </strong>
+                        </span>
+                        {today_attendance.check_out_at && (
+                            <>
+                                <span className="text-emerald-400">|</span>
+                                <LogOut className="h-4 w-4" />
+                                <span>
+                                    Pulang:{' '}
+                                    <strong>
+                                        {new Date(today_attendance.check_out_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                    </strong>
+                                </span>
+                            </>
+                        )}
+                    </div>
+                    <p className="mb-4 text-xs text-emerald-600">
+                        Status:{' '}
+                        <span className="font-bold uppercase">{today_attendance.status}</span>
+                    </p>
+                    {!today_attendance.check_out_at ? (
+                        <div className="space-y-3">
+                            {/* Warning: not yet time */}
+                            {!canCheckOut && minutesUntilEnd !== null && minutesUntilEnd > 0 && (
+                                <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                                    <div className="text-xs text-amber-700">
+                                        <p className="font-semibold">Belum waktunya pulang</p>
+                                        <p>
+                                            Presensi pulang baru bisa dilakukan pukul{' '}
+                                            <strong>{work_schedule?.end_time}</strong>.
+                                            Sisa <strong>{minutesUntilEnd} menit</strong> lagi.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={handleCheckOut}
+                                disabled={!canCheckOut}
+                                className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold text-white shadow-md transition-transform active:scale-[0.98] ${
+                                    canCheckOut
+                                        ? 'bg-emerald-600 shadow-emerald-200 hover:bg-emerald-700'
+                                        : 'cursor-not-allowed bg-gray-400 shadow-gray-200'
+                                }`}
+                            >
+                                <LogOut className="h-5 w-5" />
+                                {canCheckOut ? 'Presensi Pulang' : `Tunggu ${minutesUntilEnd ?? '...'} menit lagi`}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-100 py-3 text-sm font-semibold text-emerald-700">
+                            <CheckCircle2 className="h-5 w-5" />
+                            Presensi Hari Ini Lengkap
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Izin/Sakit already submitted */}
+            {today_attendance && ['izin', 'sakit'].includes(today_attendance.status) && (
+                <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
+                    <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-amber-500" />
+                    <p className="font-semibold text-amber-800">Presensi Sudah Dicatat</p>
+                    <p className="mt-1 text-sm text-amber-600">
+                        Status: <span className="font-bold uppercase">{today_attendance.status}</span>
+                    </p>
+                </div>
+            )}
+
+            {/* Only show the form if not yet submitted today */}
+            {!today_attendance && (
+                <>
 
             {/* Toggle Tabs */}
             <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
@@ -728,9 +897,11 @@ export default function AttendanceForm({ profile_faces = [] }: { profile_faces: 
                     {processing ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                     ) : null}
-                    Submit Presensi
+                    Presensi Masuk
                 </button>
             </form>
+            </>
+            )}
         </MobileLayout>
     );
 }

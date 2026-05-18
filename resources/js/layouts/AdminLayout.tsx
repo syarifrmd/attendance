@@ -1,63 +1,41 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import {
-    Users,
-    FileText,
-    Settings,
-    LogOut,
-    Menu,
-    X,
-    LayoutDashboard,
-    ListChecks,
-} from 'lucide-react';
+import { LayoutDashboard, ListChecks, LogOut, Menu, Users, X } from 'lucide-react';
 
-interface MentorLayoutProps {
+interface AdminLayoutProps {
     title: string;
     children: ReactNode;
 }
 
-export default function MentorLayout({ title, children }: MentorLayoutProps) {
+export default function AdminLayout({ title, children }: AdminLayoutProps) {
     const { url } = usePage();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navItems = [
         {
             name: 'Daftar Intern',
-            href: '/mentor/dashboard',
+            href: '/admin/interns',
             icon: Users,
-            active: url.startsWith('/mentor/dashboard'),
+            active: url.startsWith('/admin/interns'),
         },
         {
             name: 'Divisi',
-            href: '/mentor/divisions',
+            href: '/admin/divisions',
             icon: ListChecks,
-            active: url.startsWith('/mentor/divisions'),
-        },
-        {
-            name: 'Export Laporan',
-            href: '/mentor/reports',
-            icon: FileText,
-            active: url.startsWith('/mentor/reports'),
-        },
-        {
-            name: 'Pengaturan',
-            href: '/mentor/settings',
-            icon: Settings,
-            active: url.startsWith('/mentor/settings'),
+            active: url.startsWith('/admin/divisions'),
         },
     ];
 
     return (
-        <div className="flex min-h-[100dvh] bg-gray-50">
+        <div className="flex min-h-[100dvh] bg-slate-50">
             <Head title={title} />
 
-            {/* Desktop Sidebar */}
-            <aside className="hidden w-64 flex-col bg-indigo-900 text-white md:flex">
-                <div className="border-b border-indigo-800 p-6 text-xl font-bold tracking-tight">
+            <aside className="hidden w-64 flex-col bg-slate-900 text-white md:flex">
+                <div className="border-b border-slate-800 p-6 text-xl font-bold tracking-tight">
                     <div className="flex items-center gap-2">
                         <LayoutDashboard size={22} />
-                        <span>Mentor</span>
+                        <span>Admin</span>
                     </div>
                 </div>
                 <nav className="flex-1 space-y-1 px-4 py-6">
@@ -67,8 +45,8 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                             href={item.href}
                             className={`flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-colors ${
                                 item.active
-                                    ? 'bg-indigo-800 text-indigo-50'
-                                    : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-indigo-50'
+                                    ? 'bg-slate-800 text-slate-50'
+                                    : 'text-slate-200 hover:bg-slate-800/50 hover:text-slate-50'
                             }`}
                         >
                             <item.icon size={20} />
@@ -76,7 +54,7 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                         </Link>
                     ))}
                 </nav>
-                <div className="border-t border-indigo-800 p-4">
+                <div className="border-t border-slate-800 p-4">
                     <Link
                         href="/logout"
                         method="post"
@@ -89,38 +67,30 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                 </div>
             </aside>
 
-            {/* Main Content Area */}
             <main className="flex min-w-0 flex-1 flex-col">
-                {/* Desktop Header */}
-                <header className="sticky top-0 z-10 hidden items-center justify-between border-b border-gray-200 bg-white px-8 py-5 md:flex">
-                    <h1 className="text-xl font-semibold text-gray-800">
+                <header className="sticky top-0 z-10 hidden items-center justify-between border-b border-slate-200 bg-white px-8 py-5 md:flex">
+                    <h1 className="text-xl font-semibold text-slate-800">
                         {title}
                     </h1>
-                    <div className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-1 text-sm text-gray-600">
-                        <span>Role: Mentor</span>
+                    <div className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1 text-sm text-slate-600">
+                        <span>Role: Admin</span>
                     </div>
                 </header>
 
-                {/* Mobile Header */}
-                <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:hidden">
-                    <h1 className="text-lg font-bold text-gray-900">
+                <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+                    <h1 className="text-lg font-bold text-slate-900">
                         {title}
                     </h1>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+                        className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
                     >
-                        {mobileMenuOpen ? (
-                            <X size={22} />
-                        ) : (
-                            <Menu size={22} />
-                        )}
+                        {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
                     </button>
                 </header>
 
-                {/* Mobile Slide-Down Menu */}
                 {mobileMenuOpen && (
-                    <div className="border-b border-gray-200 bg-white px-4 py-3 shadow-md md:hidden">
+                    <div className="border-b border-slate-200 bg-white px-4 py-3 shadow-md md:hidden">
                         <nav className="space-y-1">
                             {navItems.map((item) => (
                                 <Link
@@ -129,8 +99,8 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                                         item.active
-                                            ? 'bg-indigo-50 text-indigo-700'
-                                            : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-slate-100 text-slate-800'
+                                            : 'text-slate-600 hover:bg-slate-50'
                                     }`}
                                 >
                                     <item.icon size={18} />

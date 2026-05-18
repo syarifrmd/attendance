@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'foto', 'foto_left', 'foto_right', 'nama_lengkap', 'asal_kampus', 'divisi', 'mentor_id', 'periode_magang'])]
+#[Fillable(['user_id', 'division_id', 'foto', 'foto_left', 'foto_right', 'nama_lengkap', 'asal_kampus', 'divisi', 'mentor_id', 'periode_magang'])]
 class Profile extends Model
 {
     use HasUlids;
@@ -20,5 +20,10 @@ class Profile extends Model
     public function mentor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'mentor_id');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
     }
 }
