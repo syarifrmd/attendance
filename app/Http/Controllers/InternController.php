@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\Announcement;
 use App\Models\Attendance;
+use App\Models\Division;
+use App\Models\InternDraft;
+use App\Notifications\VerifyAccountNotification;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class InternController extends Controller
@@ -31,6 +37,104 @@ class InternController extends Controller
             'recentAttendances' => $recentAttendances,
             'announcements' => Announcement::latest()->take(5)->get(),
         ]);
+    }
+
+    /**
+     * Resend the verification email to the user.
+     */
+    public function resendVerifyEmail(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->role === Role::Intern) {
+            $profile = $user->profile;
+            if (! $profile || empty($profile->nim) || ! $profile->nim_verified_at) {
+                $user->notify(new VerifyAccountNotification);
+
+                return back()->with('success', 'Email verifikasi berhasil dikirim ulang. Silakan cek Inbox atau folder Spam Anda.');
+            }
+        }
+
+        return redirect()->route('intern.dashboard');
+    }
+
+    /**
+     * Display the Claim NIM form.
+     */
+    public function claimNimForm(Request $request)
+    {
+        // Izinkan post berikutnya tanpa tanda tangan ulang
+        $request->session()->put('can_claim_nim', true);
+
+        $profile = $request->user()?->profile;
+
+        return Inertia::render('Intern/ClaimNim', [
+            'nim' => $profile?->nim,
+            'nimVerifiedAt' => $profile?->nim_verified_at,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    /**
+     * Store the claimed NIM and bind the account.
+     */
+    public function storeNimClaim(Request $request): RedirectResponse
+    {
+        if (! $request->session()->pull('can_claim_nim', false)) {
+            abort(403, 'Sesi verifikasi tidak valid atau sudah kedaluwarsa. Silakan klik link dari email kembali.');
+        }
+
+        $request->validate([
+            'nim' => 'required|string|max:255',
+        ]);
+
+        $nim = $request->string('nim')->trim()->toString();
+        $draft = InternDraft::where('nim', $nim)->first();
+
+        if (! $draft) {
+            return back()->withErrors(['nim' => 'NIM tidak ditemukan. Pastikan Admin sudah mendaftarkan NIM Anda.']);
+        }
+
+        if ($draft->is_claimed && $draft->claimed_by_user_id !== $request->user()->id) {
+            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
+        }
+
+        if ($draft->claimed_by_user_id && $draft->claimed_by_user_id !== $request->user()->id) {
+            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
+        }
+
+        $user = $request->user();
+
+        if ($draft->is_claimed && $draft->claimed_by_user_id === $user->id && $user->profile?->nim_verified_at) {
+            return redirect()->route('intern.setup-profile')
+                ->with('success', 'NIM sudah terverifikasi.');
+        }
+
+        DB::transaction(function () use ($user, $draft) {
+            $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
+
+            $profile->fill([
+                'nim' => $draft->nim,
+                'nama_lengkap' => $draft->nama_lengkap,
+                'division_id' => $draft->division_id,
+                'internship_duration_days' => $draft->internship_duration_days,
+                'nim_verified_at' => now(),
+            ]);
+
+            if ($draft->division_id) {
+                $profile->divisi = Division::query()->whereKey($draft->division_id)->value('name');
+            }
+
+            $profile->save();
+
+            $draft->update([
+                'is_claimed' => true,
+                'claimed_by_user_id' => $user->id,
+            ]);
+        });
+
+        return redirect()->route('intern.setup-profile')
+            ->with('success', 'NIM berhasil diverifikasi. Lanjutkan melengkapi profil Anda.');
     }
 
     /**
@@ -66,7 +170,7 @@ class InternController extends Controller
         $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
 
         $divisionName = $user->profile?->division?->name ?? $request->divisi;
-        $divisionId = \App\Models\Division::where('name', $divisionName)->value('id');
+        $divisionId = Division::where('name', $divisionName)->value('id');
 
         $profile->fill([
             'foto' => $request->file('foto')->store('profiles', 'public'),

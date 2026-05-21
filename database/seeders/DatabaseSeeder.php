@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Enums\Role;
+use App\Models\Attendance;
 use App\Models\Division;
 use App\Models\Profile;
-use App\Models\Attendance;
-use App\Enums\Role;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -126,6 +126,10 @@ class DatabaseSeeder extends Seeder
             'check_in_at' => Carbon::today()->setHour(9)->setMinute(45),
             'check_out_at' => null, // Belum pulang
             'created_at' => Carbon::today()->setHour(9)->setMinute(45),
+        ]);
+
+        $this->call([
+            InternDraftSeeder::class,
         ]);
     }
 }

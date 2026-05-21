@@ -5,11 +5,14 @@ use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\InternController as ManagerInternController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\InternController;
+use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::redirect('/', '/login')->name('home');
+Route::inertia('/', 'welcome')->name('home');
 
+// Google Auth
+Route::get('/auth/google', [SocialAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'callback']);
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -31,7 +34,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('intern')->name('intern.')->group(function () {
-        // Setup Profile routes (Exempt from profile.setup middleware)
+        // Setup & Claim NIM Profile routes (Exempt from profile.setup middleware)
+        Route::get('verify-notice', function () {
+            return inertia('Intern/VerifyNotice');
+        })->name('verify-notice');
+        Route::post('verify-notice/resend', [InternController::class, 'resendVerifyEmail'])->name('verify-notice.resend');
+
+        Route::get('claim-nim', [InternController::class, 'claimNimForm'])
+            ->name('claim-nim')
+            ->middleware('signed');
+
+        Route::post('claim-nim', [InternController::class, 'storeNimClaim'])->name('claim-nim.store');
+
         Route::get('setup-profile', [InternController::class, 'setupProfile'])->name('setup-profile');
         Route::post('setup-profile', [InternController::class, 'storeProfile'])->name('setup-profile.store');
 

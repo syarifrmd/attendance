@@ -7,10 +7,22 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'division_id', 'foto', 'foto_left', 'foto_right', 'nama_lengkap', 'asal_kampus', 'divisi', 'mentor_id', 'periode_magang', 'internship_duration_days'])]
+#[Fillable(['user_id', 'nim', 'nim_verified_at', 'division_id', 'foto', 'foto_left', 'foto_right', 'nama_lengkap', 'asal_kampus', 'divisi', 'mentor_id', 'periode_magang', 'internship_duration_days'])]
 class Profile extends Model
 {
     use HasUlids;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'nim_verified_at' => 'datetime',
+        ];
+    }
 
     public function user(): BelongsTo
     {
