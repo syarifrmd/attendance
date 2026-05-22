@@ -25,10 +25,12 @@ export default function SetupProfile({
     divisionName,
     existingProfile,
     userName,
+    divisions = [],
 }: {
     divisionName?: string | null;
     existingProfile?: any;
     userName?: string;
+    divisions?: { id: string; name: string }[];
 }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -49,7 +51,7 @@ export default function SetupProfile({
         foto_right: null as File | null,
         nama_lengkap: existingProfile?.nama_lengkap || userName || '',
         asal_kampus: existingProfile?.asal_kampus || '',
-        divisi: existingProfile?.division?.name || existingProfile?.divisi || divisionName || '',
+        division_id: existingProfile?.division_id || '',
         internship_duration_days: existingProfile?.internship_duration_days || 90,
     });
     const captureCount = [data.foto, data.foto_left, data.foto_right].filter(Boolean).length;
@@ -58,10 +60,10 @@ export default function SetupProfile({
         captureStep === 'straight'
             ? 'Lurus'
             : captureStep === 'left'
-              ? 'Kiri'
-              : captureStep === 'right'
-                ? 'Kanan'
-                : 'Selesai';
+                ? 'Kiri'
+                : captureStep === 'right'
+                    ? 'Kanan'
+                    : 'Selesai';
 
     useEffect(() => {
         const loadModels = async () => {
@@ -180,7 +182,7 @@ export default function SetupProfile({
                     const constraints: MediaStreamConstraints = targetDeviceId
                         ? { video: { deviceId: { exact: targetDeviceId } } }
                         : { video: { facingMode: 'user' } };
-                        
+
                     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (fallbackError) {
                     console.warn("Kamera depan gagal, mencoba kamera default...", fallbackError);
@@ -349,9 +351,9 @@ export default function SetupProfile({
                     baselineRatio ??
                     (baselineSamples.length > 0
                         ? baselineSamples.reduce((sum, value) => sum + value, 0) /
-                          baselineSamples.length
+                        baselineSamples.length
                         : 0);
-                                const orientation = getPoseFromYaw(yawOffset, baselineValue);
+                const orientation = getPoseFromYaw(yawOffset, baselineValue);
 
                 if (orientation === 'unknown' || orientation !== expectedOrientation) {
                     poseStreak = 0;
@@ -376,8 +378,8 @@ export default function SetupProfile({
                     currentState === 'straight'
                         ? 'profile_front.jpg'
                         : currentState === 'left'
-                          ? 'profile_left.jpg'
-                          : 'profile_right.jpg';
+                            ? 'profile_left.jpg'
+                            : 'profile_right.jpg';
                 const file = await captureFrame(fileName);
                 setFlashEffect(false);
 
@@ -471,10 +473,10 @@ export default function SetupProfile({
                                 {!modelsLoaded && modelLoadProgress
                                     ? modelLoadProgress
                                     : modelsLoaded
-                                      ? captureComplete
-                                          ? '3 pose wajah tersimpan.'
-                                          : `Langkah ${Math.min(captureCount + 1, 3)}/3: Pose ${captureStepLabel}`
-                                      : 'Menunggu model AI...'}
+                                        ? captureComplete
+                                            ? '3 pose wajah tersimpan.'
+                                            : `Langkah ${Math.min(captureCount + 1, 3)}/3: Pose ${captureStepLabel}`
+                                        : 'Menunggu model AI...'}
                             </p>
                         </div>
                         {!stream && !captureComplete && (
@@ -632,18 +634,24 @@ export default function SetupProfile({
 
                 <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Divisi Penempatan
+                        Divisi Penempatan (Wajib)
                     </label>
-                    <input
-                        type="text"
-                        value={data.divisi}
-                        readOnly
-                        className="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-700 shadow-sm"
-                        placeholder="Divisi dari pendaftaran"
-                    />
-                    {errors.divisi && (
+                    <select
+                        value={data.division_id}
+                        onChange={(e) => setData('division_id', e.target.value)}
+                        required
+                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                        <option value="">Pilih Divisi...</option>
+                        {divisions.map((d) => (
+                            <option key={d.id} value={d.id}>
+                                Divisi {d.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.division_id && (
                         <p className="mt-1 text-xs text-red-500">
-                            {errors.divisi}
+                            {errors.division_id}
                         </p>
                     )}
                 </div>

@@ -209,7 +209,7 @@ export default function AttendanceForm({
                     const constraints: MediaStreamConstraints = targetDeviceId
                         ? { video: { deviceId: { exact: targetDeviceId } } }
                         : { video: { facingMode: 'user' } };
-                        
+
                     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (fallbackError) {
                     console.warn("Kamera depan gagal, mencoba kamera default...", fallbackError);
@@ -401,7 +401,7 @@ export default function AttendanceForm({
                 // Success block
                 clearTimeout(timeoutTimer);
                 setFlashEffect(true);
-                
+
                 if (videoRef.current && overlayRef.current) {
                     const displaySize = { width: videoRef.current.videoWidth, height: videoRef.current.videoHeight };
                     const resizedResult = faceapi.resizeResults(result, displaySize);
@@ -410,7 +410,7 @@ export default function AttendanceForm({
                 }
 
                 toast.success(`Identitas terverifikasi! (skor: ${minDistance.toFixed(2)})`, { id: 'liveness' });
-                
+
                 const capturedScore = minDistance.toFixed(4);
                 setTimeout(() => {
                     const canvas = faceapi.createCanvasFromMedia(videoRef.current!);
@@ -418,7 +418,7 @@ export default function AttendanceForm({
                     canvas.height = videoRef.current!.videoHeight;
                     const ctx = canvas.getContext('2d');
                     ctx?.drawImage(videoRef.current!, 0, 0);
-                    
+
                     canvas.toBlob((blob) => {
                         if (blob) {
                             setData((prev) => ({
@@ -566,10 +566,10 @@ export default function AttendanceForm({
                             {!modelsLoaded && modelLoadProgress
                                 ? modelLoadProgress
                                 : modelsLoaded
-                                  ? baselineDescriptors.length > 0
-                                      ? 'Model AI siap digunakan.'
-                                      : 'Foto profil wajah belum tersedia.'
-                                  : 'Menunggu model AI...'}
+                                    ? baselineDescriptors.length > 0
+                                        ? 'Model AI siap digunakan.'
+                                        : 'Foto profil wajah belum tersedia.'
+                                    : 'Menunggu model AI...'}
                         </p>
                     </div>
                     {!stream && !data.face_verification_image && (
@@ -591,7 +591,7 @@ export default function AttendanceForm({
                         <canvas ref={overlayRef} className="absolute inset-0 h-full w-full object-cover pointer-events-none" />
                         <div className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-200 ${flashEffect ? 'opacity-90' : 'opacity-0'}`} />
                         <div className="pointer-events-none absolute inset-0 ring-4 ring-white/20 ring-inset rounded-lg" />
-                        
+
                         {cameras.length > 0 && (
                             <div className="absolute top-2 right-2 left-2 z-10">
                                 <select value={selectedCameraId} onChange={handleCameraChange} className="w-full rounded-lg border-none bg-black/50 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm focus:ring-2 focus:ring-white/50 appearance-none">
@@ -705,11 +705,10 @@ export default function AttendanceForm({
                     <p className="mb-4 text-xs text-emerald-600 flex items-center gap-2">
                         <span>Status Kehadiran: <span className="font-bold uppercase">{today_attendance.status}</span></span>
                         {today_attendance.is_late !== undefined && (
-                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                                today_attendance.late_level === 'green' ? 'bg-green-100 text-green-700' :
-                                today_attendance.late_level === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${today_attendance.late_level === 'green' ? 'bg-green-100 text-green-700' :
+                                    today_attendance.late_level === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700'
+                                }`}>
                                 {today_attendance.late_level === 'green' ? 'Tepat Waktu' : `Terlambat ${today_attendance.late_minutes}m`}
                             </span>
                         )}
@@ -717,7 +716,7 @@ export default function AttendanceForm({
                     {!today_attendance.check_out_at ? (
                         <form onSubmit={handleCheckOut} className="space-y-4">
                             {today_attendance.status === 'wfo' && renderWFORequirements()}
-                            
+
                             {!canCheckOut && minutesUntilEnd !== null && minutesUntilEnd > 0 && (
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
@@ -750,11 +749,10 @@ export default function AttendanceForm({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold text-white shadow-md transition-transform active:scale-[0.98] ${
-                                    canCheckOut || data.checkout_reason.trim().length > 0
+                                className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold text-white shadow-md transition-transform active:scale-[0.98] ${canCheckOut || data.checkout_reason.trim().length > 0
                                         ? 'bg-emerald-600 shadow-emerald-200 hover:bg-emerald-700'
                                         : 'cursor-not-allowed bg-gray-400 shadow-gray-200'
-                                }`}
+                                    }`}
                             >
                                 {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogOut className="h-5 w-5" />}
                                 {canCheckOut ? 'Presensi Pulang' : 'Pulang Lebih Awal'}
@@ -784,105 +782,105 @@ export default function AttendanceForm({
             {!today_attendance && (
                 <>
 
-            {/* Toggle Tabs - 3 tabs */}
-            <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
-                <button type="button" onClick={() => { setActiveTab('wfo'); setData((p) => ({ ...p, status: 'wfo', latitude: '', longitude: '', face_verification_image: null, reason: '', proof_image: null })); setLocationStatus('pending'); setGeoError(null); }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'wfo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
-                    WFO
-                </button>
-                <button type="button" onClick={() => { setActiveTab('wfhwfa'); setData((p) => ({ ...p, status: 'wfh', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'wfhwfa' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
-                    WFH / WFA
-                </button>
-                <button type="button" onClick={() => { setActiveTab('offsite'); setData((p) => ({ ...p, status: 'izin', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${ activeTab === 'offsite' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500' }`}>
-                    Izin / Sakit
-                </button>
-            </div>
+                    {/* Toggle Tabs - 3 tabs */}
+                    <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
+                        <button type="button" onClick={() => { setActiveTab('wfo'); setData((p) => ({ ...p, status: 'wfo', latitude: '', longitude: '', face_verification_image: null, reason: '', proof_image: null })); setLocationStatus('pending'); setGeoError(null); }}
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            WFO
+                        </button>
+                        <button type="button" onClick={() => { setActiveTab('wfhwfa'); setData((p) => ({ ...p, status: 'wfh', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfhwfa' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            WFH / WFA
+                        </button>
+                        <button type="button" onClick={() => { setActiveTab('offsite'); setData((p) => ({ ...p, status: 'izin', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'offsite' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            Izin / Sakit
+                        </button>
+                    </div>
 
-            <form onSubmit={submitAttendance} className="space-y-5 pb-8">
-                {/* Status Selection */}
-                <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Status Kehadiran
-                    </label>
-                    <select
-                        value={data.status}
-                        onChange={(e) => setData('status', e.target.value)}
-                        disabled={activeTab === 'wfo'}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500"
-                    >
-                        {activeTab === 'wfo' && <option value="wfo">Work From Office (WFO)</option>}
-                        {activeTab === 'wfhwfa' && (
-                            <>
-                                <option value="wfh">Work From Home (WFH)</option>
-                                <option value="wfa">Work From Anywhere (WFA)</option>
-                            </>
-                        )}
-                        {activeTab === 'offsite' && (
-                            <>
-                                <option value="izin">Izin</option>
-                                <option value="sakit">Sakit</option>
-                            </>
-                        )}
-                    </select>
-                    {errors.status && (
-                        <p className="mt-1 text-xs text-red-500">
-                            {errors.status}
-                        </p>
-                    )}
-                </div>
-
-                {activeTab === 'wfo' && renderWFORequirements()}
-
-                {(activeTab === 'wfhwfa' || activeTab === 'offsite') && (
-                    <>
+                    <form onSubmit={submitAttendance} className="space-y-5 pb-8">
+                        {/* Status Selection */}
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Alasan (Wajib)
+                                Status Kehadiran
                             </label>
-                            <textarea
-                                value={data.reason}
-                                onChange={(e) => setData('reason', e.target.value)}
-                                rows={3}
-                                className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                placeholder={`Jelaskan alasan ${activeTab === 'offsite' ? 'izin / sakit' : 'WFH / WFA'}...`}
-                            />
-                            {errors.reason && <p className="mt-1 text-xs text-red-500">{errors.reason}</p>}
+                            <select
+                                value={data.status}
+                                onChange={(e) => setData('status', e.target.value)}
+                                disabled={activeTab === 'wfo'}
+                                className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500"
+                            >
+                                {activeTab === 'wfo' && <option value="wfo">Work From Office (WFO)</option>}
+                                {activeTab === 'wfhwfa' && (
+                                    <>
+                                        <option value="wfh">Work From Home (WFH)</option>
+                                        <option value="wfa">Work From Anywhere (WFA)</option>
+                                    </>
+                                )}
+                                {activeTab === 'offsite' && (
+                                    <>
+                                        <option value="izin">Izin</option>
+                                        <option value="sakit">Sakit</option>
+                                    </>
+                                )}
+                            </select>
+                            {errors.status && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.status}
+                                </p>
+                            )}
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                {activeTab === 'offsite' ? 'Bukti Foto / Surat Dokter (Wajib)' : 'Foto Bukti (Opsional)'}
-                            </label>
-                            <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-gray-500">
-                                <UploadCloud className="mb-2 h-8 w-8" />
-                                <span className="text-sm">Klik untuk upload foto</span>
-                                <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/jpg"
-                                    onChange={(e) => setData('proof_image', e.target.files?.[0] || null)}
-                                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                />
-                            </div>
-                            {data.proof_image && <p className="mt-2 text-xs text-green-600">File terpilih: {data.proof_image.name}</p>}
-                            {errors.proof_image && <p className="mt-1 text-xs text-red-500">{errors.proof_image}</p>}
-                        </div>
-                    </>
-                )}
+                        {activeTab === 'wfo' && renderWFORequirements()}
 
-                <button
-                    type="submit"
-                    disabled={processing}
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-transform active:scale-[0.98]"
-                >
-                    {processing ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : null}
-                    Presensi Masuk
-                </button>
-            </form>
-            </>
+                        {(activeTab === 'wfhwfa' || activeTab === 'offsite') && (
+                            <>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                        Alasan (Wajib)
+                                    </label>
+                                    <textarea
+                                        value={data.reason}
+                                        onChange={(e) => setData('reason', e.target.value)}
+                                        rows={3}
+                                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder={`Jelaskan alasan ${activeTab === 'offsite' ? 'izin / sakit' : 'WFH / WFA'}...`}
+                                    />
+                                    {errors.reason && <p className="mt-1 text-xs text-red-500">{errors.reason}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                        {activeTab === 'offsite' ? 'Bukti Foto / Surat Dokter (Wajib)' : 'Foto Bukti (Opsional)'}
+                                    </label>
+                                    <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-gray-500">
+                                        <UploadCloud className="mb-2 h-8 w-8" />
+                                        <span className="text-sm">Klik untuk upload foto</span>
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/jpg"
+                                            onChange={(e) => setData('proof_image', e.target.files?.[0] || null)}
+                                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                        />
+                                    </div>
+                                    {data.proof_image && <p className="mt-2 text-xs text-green-600">File terpilih: {data.proof_image.name}</p>}
+                                    {errors.proof_image && <p className="mt-1 text-xs text-red-500">{errors.proof_image}</p>}
+                                </div>
+                            </>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-transform active:scale-[0.98]"
+                        >
+                            {processing ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : null}
+                            Presensi Masuk
+                        </button>
+                    </form>
+                </>
             )}
         </MobileLayout>
     );

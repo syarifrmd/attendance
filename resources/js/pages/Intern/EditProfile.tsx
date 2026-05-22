@@ -8,11 +8,12 @@ interface ProfileData {
     nama_lengkap: string;
     asal_kampus?: string;
     divisi?: string;
+    division_id?: string;
     internship_duration_days?: number;
     division?: {
+        id: string;
         name: string;
     };
-    foto?: string;
 }
 
 interface UserData {
@@ -21,12 +22,13 @@ interface UserData {
     profile?: ProfileData;
 }
 
-export default function EditProfile({ user }: { user: UserData }) {
+export default function EditProfile({ user, divisions = [] }: { user: UserData, divisions?: { id: string; name: string }[] }) {
     const profile = user.profile;
 
     const { data, setData, patch, processing, errors } = useForm({
         nama_lengkap: profile?.nama_lengkap || user.name,
         asal_kampus: profile?.asal_kampus || '',
+        division_id: profile?.division_id || profile?.division?.id || '',
         internship_duration_days: profile?.internship_duration_days || 90,
     });
 
@@ -121,14 +123,25 @@ export default function EditProfile({ user }: { user: UserData }) {
 
                 <div>
                     <label className="mb-2 block text-sm font-medium text-gray-700">
-                        Divisi Penempatan (Tidak bisa diubah)
+                        Divisi Penempatan (Opsional / Jika Diizinkan)
                     </label>
-                    <input
-                        type="text"
-                        value={profile?.division?.name || profile?.divisi || 'Belum diatur'}
-                        readOnly
-                        className="w-full cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-700 shadow-sm"
-                    />
+                    <select
+                        value={data.division_id}
+                        onChange={(e) => setData('division_id', e.target.value)}
+                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                        <option value="">Pilih Divisi...</option>
+                        {divisions.map((d) => (
+                            <option key={d.id} value={d.id}>
+                                Divisi {d.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.division_id && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.division_id}
+                        </p>
+                    )}
                 </div>
 
                 <div>

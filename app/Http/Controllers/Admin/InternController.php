@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Division;
+use App\Models\InternDraft;
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -115,24 +118,31 @@ class InternController extends Controller
             return $intern;
         });
 
+        // Intern drafts (pre-registered, not yet claimed)
+        $drafts = InternDraft::with('division')
+            ->where('is_claimed', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return Inertia::render('Mentor/Interns/Index', [
             'interns' => $interns,
             'divisions' => Division::orderBy('name')->get(['id', 'name']),
             'filters' => $request->only(['search', 'division_id', 'today_status', 'date']),
             'selected_date' => $date->toDateString(),
+            'drafts' => $drafts,
         ]);
     }
 
     /**
-     * Show attendance detail for a specific intern.
+     * Show attendance detail for a specific intern (rendered in Admin view for admin role).
      */
-    public function show(Request $request, User $user): Response
+    public function show(Request $request, User $intern): Response
     {
-        abort_if($user->isManager() || $user->isIntern() === false, 404);
+        abort_if($intern->isManager() || $intern->isIntern() === false, 404);
 
-        $user->load('profile.division');
+        $intern->load('profile.division');
 
-        $query = $user->attendances()->latest();
+        $query = $intern->attendances()->latest();
 
         if ($request->filled('from')) {
             $query->whereDate('created_at', '>=', $request->from);
@@ -145,7 +155,7 @@ class InternController extends Controller
         }
 
         $attendances = $query->paginate(20)->withQueryString();
-        $division = $user->profile?->division;
+        $division = $intern->profile?->division;
 
         $attendances->getCollection()->transform(function (Attendance $att) use ($division) {
             $late = $this->lateMeta($att, $division);
@@ -160,17 +170,179 @@ class InternController extends Controller
             ]);
         });
 
+        $divisions = Division::orderBy('name')->get(['id', 'name']);
+
         return Inertia::render('Mentor/Interns/Show', [
-            'intern' => $user,
+            'intern' => $intern,
             'attendances' => $attendances,
             'division' => $division,
             'filters' => $request->only(['from', 'to', 'status']),
             'stats' => [
-                'total_checkin' => $user->attendances()->whereIn('status', ['wfo', 'wfh', 'wfa'])->count(),
-                'total_absent' => $user->attendances()->whereIn('status', ['izin', 'sakit'])->count(),
-                'total_late' => $this->countLateAttendances($user, $division),
+                'total_checkin' => $intern->attendances()->whereIn('status', ['wfo', 'wfh', 'wfa'])->count(),
+                'total_absent' => $intern->attendances()->whereIn('status', ['izin', 'sakit'])->count(),
+                'total_late' => $this->countLateAttendances($intern, $division),
             ],
+            'divisions' => $divisions,
         ]);
+    }
+
+    /**
+     * Update an intern's profile and user data (manager override).
+     */
+    public function update(Request $request, User $intern): RedirectResponse
+    {
+        abort_if($intern->isManager() || $intern->isIntern() === false, 404);
+
+        $validated = $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'asal_kampus' => 'nullable|string|max:255',
+            'division_id' => 'nullable|exists:divisions,id',
+            'periode_magang' => 'nullable|string|max:255',
+            'internship_duration_days' => 'nullable|integer|min:1|max:730',
+            'email' => 'sometimes|email|max:255|unique:users,email,'.$intern->id,
+        ]);
+
+        if (isset($validated['email'])) {
+            $intern->update(['email' => $validated['email']]);
+        }
+
+        $profile = $intern->profile()->firstOrCreate(
+            ['user_id' => $intern->id],
+            ['nama_lengkap' => $validated['nama_lengkap']]
+        );
+
+        $divisionId = $validated['division_id'] ?? null;
+        $divisionName = $divisionId ? Division::find($divisionId)?->name : $profile->divisi;
+
+        $profile->update([
+            'nama_lengkap' => $validated['nama_lengkap'],
+            'asal_kampus' => $validated['asal_kampus'] ?? $profile->asal_kampus,
+            'division_id' => $divisionId,
+            'divisi' => $divisionName,
+            'periode_magang' => $validated['periode_magang'] ?? $profile->periode_magang,
+            'internship_duration_days' => $validated['internship_duration_days'] ?? $profile->internship_duration_days ?? 90,
+        ]);
+
+        return back()->with('success', 'Data intern berhasil diperbarui.');
+    }
+
+    /**
+     * Delete an intern user (and their profile/attendances via cascade).
+     */
+    public function destroy(User $intern): RedirectResponse
+    {
+        abort_if($intern->isManager() || $intern->isIntern() === false, 404);
+
+        $intern->delete();
+
+        return redirect()->route('mentor.interns.index')->with('success', 'Intern berhasil dihapus.');
+    }
+
+    /**
+     * Store a new intern draft or remove if inactive.
+     */
+    public function storeDraft(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nim' => 'required|string|max:255',
+            'nama_lengkap' => 'required|string|max:255',
+            'division_id' => 'nullable|exists:divisions,id',
+            'internship_duration_days' => 'nullable|integer|min:1|max:730',
+            'is_active' => 'boolean',
+        ]);
+
+        $isActive = $validated['is_active'] ?? true;
+
+        if (! $isActive) {
+            // Hard delete
+            InternDraft::where('nim', $validated['nim'])->delete();
+            $user = Profile::where('nim', $validated['nim'])->first()?->user;
+            if ($user && $user->role === Role::Intern) {
+                $user->delete();
+            }
+
+            return back()->with('success', 'Data intern berhasil dihapus karena berstatus Tidak Aktif.');
+        }
+
+        // Validate uniqueness only if creating active
+        $request->validate(['nim' => 'unique:intern_drafts,nim']);
+
+        InternDraft::create([
+            'nim' => $validated['nim'],
+            'nama_lengkap' => $validated['nama_lengkap'],
+            'division_id' => $validated['division_id'] ?? null,
+            'internship_duration_days' => $validated['internship_duration_days'] ?? 90,
+            'is_claimed' => false,
+        ]);
+
+        return back()->with('success', 'Data intern baru berhasil ditambahkan. Intern dapat mendaftar menggunakan NIM yang telah didaftarkan.');
+    }
+
+    /**
+     * Process bulk import of intern drafts from frontend.
+     */
+    public function importProcess(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'drafts' => 'required|array|min:1',
+            'drafts.*.nim' => 'required|string|max:255',
+            'drafts.*.nama_lengkap' => 'required|string|max:255',
+            'drafts.*.division_id' => 'nullable|exists:divisions,id',
+            'drafts.*.internship_duration_days' => 'nullable|integer|min:1|max:730',
+            'drafts.*.is_active' => 'boolean',
+        ]);
+
+        $countAdded = 0;
+        $countDeleted = 0;
+
+        foreach ($validated['drafts'] as $draft) {
+            $isActive = $draft['is_active'] ?? true;
+
+            if (! $isActive) {
+                // Hard delete logic
+                $draftDeleted = InternDraft::where('nim', $draft['nim'])->delete();
+                $user = Profile::where('nim', $draft['nim'])->first()?->user;
+                if ($user && $user->role === Role::Intern) {
+                    $user->delete();
+                    $countDeleted++;
+                } elseif ($draftDeleted) {
+                    $countDeleted++;
+                }
+            } else {
+                // Add active logic
+                $existsInDrafts = InternDraft::where('nim', $draft['nim'])->exists();
+                if (! $existsInDrafts) {
+                    InternDraft::create([
+                        'nim' => $draft['nim'],
+                        'nama_lengkap' => $draft['nama_lengkap'],
+                        'division_id' => $draft['division_id'] ?? null,
+                        'internship_duration_days' => $draft['internship_duration_days'] ?? 90,
+                        'is_claimed' => false,
+                    ]);
+                    $countAdded++;
+                }
+            }
+        }
+
+        $message = 'Berhasil memproses import.';
+        if ($countAdded > 0) {
+            $message .= " $countAdded data ditambahkan.";
+        }
+        if ($countDeleted > 0) {
+            $message .= " $countDeleted data dihapus (resign).";
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Delete an intern draft.
+     */
+    public function destroyDraft(InternDraft $internDraft): RedirectResponse
+    {
+        $internDraft->delete();
+
+        return back()->with('success', 'Data draft intern berhasil dihapus.');
     }
 
     /**

@@ -35,7 +35,9 @@ class InternController extends Controller
             'daysAttended' => $user->attendances()->whereIn('status', ['wfo', 'wfh', 'wfa'])->count(),
             'daysAbsent' => $user->attendances()->whereIn('status', ['izin', 'sakit'])->count(),
             'recentAttendances' => $recentAttendances,
-            'announcements' => Announcement::latest()->take(5)->get(),
+            'announcements' => Announcement::whereNull('division_id')
+                ->orWhere('division_id', $user->profile?->division_id)
+                ->latest()->take(5)->get(),
         ]);
     }
 
@@ -148,6 +150,7 @@ class InternController extends Controller
             'divisionName' => $user->profile?->division?->name ?? $user->profile?->divisi,
             'existingProfile' => $user->profile,
             'userName' => $user->name,
+            'divisions' => Division::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -162,15 +165,16 @@ class InternController extends Controller
             'foto_right' => 'nullable|image|max:5120',
             'nama_lengkap' => 'required|string|max:255',
             'asal_kampus' => 'nullable|string|max:255',
-            'divisi' => 'nullable|string|max:255',
+            'division_id' => 'nullable|exists:divisions,id',
             'internship_duration_days' => 'required|integer|min:1|max:365',
         ]);
 
         $user = $request->user();
         $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
 
-        $divisionName = $user->profile?->division?->name ?? $request->divisi;
-        $divisionId = Division::where('name', $divisionName)->value('id');
+        $divisionId = $request->division_id ?? $user->profile?->division_id;
+        $division = Division::find($divisionId);
+        $divisionName = $division?->name ?? $user->profile?->divisi;
 
         $profile->fill([
             'foto' => $request->file('foto')->store('profiles', 'public'),
@@ -211,6 +215,7 @@ class InternController extends Controller
     {
         return Inertia::render('Intern/EditProfile', [
             'user' => $request->user()->load('profile.division'),
+            'divisions' => Division::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -222,15 +227,21 @@ class InternController extends Controller
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'asal_kampus' => 'nullable|string|max:255',
+            'division_id' => 'nullable|exists:divisions,id',
             'internship_duration_days' => 'required|integer|min:1|max:365',
         ]);
 
         $user = $request->user();
         $profile = $user->profile;
 
+        $divisionId = $request->division_id ?? $profile->division_id;
+        $division = Division::find($divisionId);
+
         $profile->update([
             'nama_lengkap' => $request->nama_lengkap,
             'asal_kampus' => $request->asal_kampus,
+            'division_id' => $divisionId,
+            'divisi' => $division?->name ?? $profile->divisi,
             'internship_duration_days' => $request->internship_duration_days,
         ]);
 

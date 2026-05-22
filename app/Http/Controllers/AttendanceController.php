@@ -122,6 +122,7 @@ class AttendanceController extends Controller
                 $isEarly = true;
                 if (! $request->filled('checkout_reason')) {
                     $endFormatted = $endTime->format('H:i');
+
                     return back()->withErrors(['checkout' => "Presensi pulang sebelum jam {$endFormatted} wajib menyertakan alasan (Alasan Pulang Awal)."]);
                 }
             }

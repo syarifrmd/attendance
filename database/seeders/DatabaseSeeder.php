@@ -45,6 +45,13 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => Role::Mentor,
         ]);
+        // 2. Create Mentor / Admin User
+        $mentor = User::create([
+            'name' => 'Admin Indosat',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => Role::Admin,
+        ]);
 
         // 3. Create Interns
         $intern1 = User::create([

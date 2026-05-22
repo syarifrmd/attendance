@@ -12,6 +12,10 @@ import {
     SlidersHorizontal,
     CalendarDays,
     ChevronLeft,
+    UserPlus,
+    X,
+    Users,
+    Trash2,
 } from 'lucide-react';
 
 interface Division {
@@ -46,6 +50,12 @@ interface Intern {
     today_attendance: TodayAttendance | null;
 }
 
+interface InternDraft {
+    id: number; nim: string; nama_lengkap: string;
+    division: Division | null; internship_duration_days: number;
+    is_claimed: boolean; created_at: string;
+}
+
 interface PaginatedInterns {
     data: Intern[];
     links: { url: string | null; label: string; active: boolean }[];
@@ -59,6 +69,7 @@ interface Props {
     divisions: Division[];
     filters: { search?: string; division_id?: string; today_status?: string; date?: string };
     selected_date: string;
+    drafts?: InternDraft[];
 }
 
 const statusOptions = [
@@ -98,18 +109,27 @@ const formatDateID = (dateStr: string) =>
 
 const isToday = (dateStr: string) => dateStr === new Date().toISOString().split('T')[0];
 
-export default function AdminInternsIndex({ interns, divisions, filters, selected_date }: Props) {
+export default function AdminInternsIndex({ interns, divisions, filters, selected_date, drafts = [] }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
     const [divisionId, setDivisionId] = useState(filters.division_id ?? '');
     const [todayStatus, setTodayStatus] = useState(filters.today_status ?? '');
     const [date, setDate] = useState(selected_date);
 
-    // Edit modal state
+    // Edit attendance modal state
     const [editModal, setEditModal] = useState<TodayAttendance | null>(null);
     const [editForm, setEditForm] = useState({ status: '', check_in_at: '', check_out_at: '', reason: '' });
 
+    // Add draft modal
+    const [addModal, setAddModal] = useState(false);
+    const [addForm, setAddForm] = useState({ nim: '', nama_lengkap: '', division_id: '', internship_duration_days: '90' });
+    const [addErrors, setAddErrors] = useState<Record<string, string>>({});
+    const [addLoading, setAddLoading] = useState(false);
+
+    // Draft list panel
+    const [showDrafts, setShowDrafts] = useState(false);
+
     const navigate = (newDate: string, extras?: Record<string, string>) => {
-        router.get('/admin/interns', {
+        router.get('/mentor/interns', {
             date: newDate,
             search: search || undefined,
             division_id: divisionId || undefined,
@@ -123,7 +143,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
     const resetFilters = () => {
         const today = new Date().toISOString().split('T')[0];
         setSearch(''); setDivisionId(''); setTodayStatus(''); setDate(today);
-        router.get('/admin/interns', {}, { replace: true });
+        router.get('/mentor/interns', {}, { replace: true });
     };
 
     const openEdit = (att: TodayAttendance) => {
@@ -138,14 +158,33 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
 
     const submitEdit = () => {
         if (!editModal) return;
-        router.patch(`/admin/attendances/${editModal.id}`, editForm, {
+        router.patch(`/mentor/attendances/${editModal.id}`, editForm, {
             onSuccess: () => setEditModal(null),
         });
     };
 
     const handleDelete = (attId: string) => {
         if (!confirm('Hapus data absensi ini?')) return;
-        router.delete(`/admin/attendances/${attId}`);
+        router.delete(`/mentor/attendances/${attId}`);
+    };
+
+    const submitAddDraft = () => {
+        setAddLoading(true);
+        setAddErrors({});
+        router.post('/mentor/intern-drafts', {
+            nim: addForm.nim,
+            nama_lengkap: addForm.nama_lengkap,
+            division_id: addForm.division_id || undefined,
+            internship_duration_days: parseInt(addForm.internship_duration_days) || 90,
+        }, {
+            onSuccess: () => { setAddModal(false); setAddForm({ nim: '', nama_lengkap: '', division_id: '', internship_duration_days: '90' }); setAddLoading(false); },
+            onError: (errs) => { setAddErrors(errs); setAddLoading(false); },
+        });
+    };
+
+    const handleDeleteDraft = (id: number) => {
+        if (!confirm('Hapus data pre-registrasi ini?')) return;
+        router.delete(`/mentor/intern-drafts/${id}`);
     };
 
     const todayPresent = interns.data.filter((i) => i.today_attendance && ['wfo','wfh','wfa'].includes(i.today_attendance.status)).length;
@@ -157,9 +196,29 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
             <Head title="Daftar Intern" />
 
             {/* Page Header */}
-            <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">Daftar Intern</h2>
-                <p className="mt-1 text-sm text-slate-500">Pantau status kehadiran dan detail absensi seluruh intern.</p>
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900">Daftar Intern</h2>
+                    <p className="mt-1 text-sm text-slate-500">Pantau status kehadiran dan detail absensi seluruh intern.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    {drafts.length > 0 && (
+                        <button
+                            onClick={() => setShowDrafts(true)}
+                            className="relative flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+                        >
+                            <Users size={14} />
+                            Pre-registrasi
+                            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">{drafts.length}</span>
+                        </button>
+                    )}
+                    <button
+                        onClick={() => setAddModal(true)}
+                        className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition-colors"
+                    >
+                        <UserPlus size={15} /> Tambah Intern
+                    </button>
+                </div>
             </div>
 
             {/* Date Navigator */}
@@ -343,7 +402,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                                                     </>
                                                 ) : null}
                                                 <Link
-                                                    href={`/admin/interns/${intern.id}`}
+                                                    href={`/mentor/interns/${intern.id}`}
                                                     className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50"
                                                 >
                                                     Detail <ChevronRight size={12} />
@@ -418,6 +477,149 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                             <button onClick={submitEdit} className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                                 Simpan
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Intern Draft Modal */}
+            {addModal && (
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center" onClick={() => setAddModal(false)}>
+                    <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100">
+                                    <UserPlus size={18} className="text-slate-700" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900">Tambah Intern Baru</h3>
+                                    <p className="text-xs text-slate-400">Pre-registrasi sebelum intern mendaftar</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setAddModal(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-600">
+                                <strong>Cara kerja:</strong> Admin mendaftarkan NIM terlebih dahulu. Intern kemudian mendaftar via Google dan memasukkan NIM mereka untuk verifikasi akun.
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                                        NIM <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={addForm.nim}
+                                        onChange={(e) => setAddForm({ ...addForm, nim: e.target.value })}
+                                        placeholder="Nomor Induk Mahasiswa"
+                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none ${addErrors.nim ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                                    />
+                                    {addErrors.nim && <p className="mt-1 text-xs text-rose-500">{addErrors.nim}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">Divisi</label>
+                                    <select
+                                        value={addForm.division_id}
+                                        onChange={(e) => setAddForm({ ...addForm, division_id: e.target.value })}
+                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none"
+                                    >
+                                        <option value="">Pilih Divisi (Opsional)</option>
+                                        {divisions.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                                        Nama Lengkap <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={addForm.nama_lengkap}
+                                        onChange={(e) => setAddForm({ ...addForm, nama_lengkap: e.target.value })}
+                                        placeholder="Nama lengkap intern"
+                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none ${addErrors.nama_lengkap ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                                    />
+                                    {addErrors.nama_lengkap && <p className="mt-1 text-xs text-rose-500">{addErrors.nama_lengkap}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">Durasi Magang (Hari)</label>
+                                    <input
+                                        type="number"
+                                        value={addForm.internship_duration_days}
+                                        onChange={(e) => setAddForm({ ...addForm, internship_duration_days: e.target.value })}
+                                        min="1" max="730"
+                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
+                            <button onClick={() => setAddModal(false)} className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                                Batal
+                            </button>
+                            <button
+                                onClick={submitAddDraft}
+                                disabled={addLoading || !addForm.nim || !addForm.nama_lengkap}
+                                className="flex-1 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {addLoading ? 'Menyimpan...' : 'Simpan Data'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Draft List Panel */}
+            {showDrafts && (
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center" onClick={() => setShowDrafts(false)}>
+                    <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                            <div>
+                                <h3 className="text-base font-bold text-slate-900">Pre-registrasi Intern</h3>
+                                <p className="text-xs text-slate-400">{drafts.length} intern belum mendaftar</p>
+                            </div>
+                            <button onClick={() => setShowDrafts(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="overflow-y-auto flex-1">
+                            {drafts.length === 0 ? (
+                                <div className="py-10 text-center text-slate-400 text-sm">Tidak ada data pre-registrasi.</div>
+                            ) : (
+                                <table className="w-full text-sm text-slate-600">
+                                    <thead className="bg-slate-50 text-xs uppercase text-slate-400 sticky top-0">
+                                        <tr>
+                                            <th className="px-5 py-3 text-left">NIM</th>
+                                            <th className="px-5 py-3 text-left">Nama</th>
+                                            <th className="px-5 py-3 text-left">Divisi</th>
+                                            <th className="px-5 py-3 text-left">Durasi</th>
+                                            <th className="px-5 py-3 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {drafts.map((d) => (
+                                            <tr key={d.id} className="border-t border-slate-100 hover:bg-slate-50/60">
+                                                <td className="px-5 py-3 font-mono text-xs font-medium text-slate-700">{d.nim}</td>
+                                                <td className="px-5 py-3 font-medium text-slate-800">{d.nama_lengkap}</td>
+                                                <td className="px-5 py-3 text-slate-500">{d.division?.name || '-'}</td>
+                                                <td className="px-5 py-3 text-slate-500">{d.internship_duration_days} hari</td>
+                                                <td className="px-5 py-3 text-center">
+                                                    <button onClick={() => handleDeleteDraft(d.id)} className="rounded-lg border border-rose-200 p-1.5 text-rose-500 hover:bg-rose-50 transition-colors">
+                                                        <Trash2 size={13} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 use App\Enums\Role;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\InternController as ManagerInternController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\InternController;
 use App\Http\Controllers\SocialAuthController;
@@ -70,9 +71,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::prefix('mentor')->name('mentor.')->middleware('mentor')->group(function () {
         Route::resource('divisions', DivisionController::class)->except(['show']);
-        Route::resource('interns', ManagerInternController::class)->only(['index', 'show']);
+        Route::resource('interns', ManagerInternController::class)->only(['index', 'show', 'update', 'destroy']);
         Route::patch('attendances/{attendance}', [ManagerInternController::class, 'updateAttendance'])->name('attendances.update');
         Route::delete('attendances/{attendance}', [ManagerInternController::class, 'destroyAttendance'])->name('attendances.destroy');
+        Route::post('intern-drafts/import', [ManagerInternController::class, 'importProcess'])->name('intern-drafts.import');
+        Route::post('intern-drafts', [ManagerInternController::class, 'storeDraft'])->name('intern-drafts.store');
+        Route::delete('intern-drafts/{internDraft}', [ManagerInternController::class, 'destroyDraft'])->name('intern-drafts.destroy');
+        Route::resource('announcements', AnnouncementController::class)->only(['index', 'store', 'destroy']);
     });
 
     /*
