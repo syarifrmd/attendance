@@ -1,7 +1,8 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import AttendanceSummaryCard from '@/components/PWA/AttendanceSummaryCard';
 import { Clock, Bell, ChevronRight } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 interface Attendance {
     id: string;
@@ -18,7 +19,10 @@ interface Announcement {
 }
 
 interface DashboardProps {
-    auth: { user: any };
+    auth: {
+        user: any;
+        unread_notifications_count?: number;
+    };
     totalDays: number;
     daysAttended: number;
     daysAbsent: number;
@@ -34,6 +38,55 @@ export default function Dashboard({
     recentAttendances = [],
     announcements = [],
 }: DashboardProps) {
+    useEffect(() => {
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === 'granted') {
+                        new Notification('Attendance App', {
+                            body: 'Izin notifikasi aktif! Anda akan menerima pengumuman terbaru di sini.',
+                        });
+                    }
+                });
+            } else if (Notification.permission === 'granted') {
+                const lastNotified = sessionStorage.getItem('pwa_welcome_notified');
+                if (!lastNotified) {
+                    new Notification('Attendance App', {
+                        body: `Halo, ${auth.user.name}! Selamat bekerja dan beraktivitas hari ini.`,
+                    });
+                    sessionStorage.setItem('pwa_welcome_notified', 'true');
+                }
+            }
+        }
+    }, [auth.user.name]);
+
+    // Real-time unread notification count & announcements AJAX poller
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['auth', 'announcements'],
+                preserveScroll: true,
+                preserveState: true,
+            });
+        }, 10000); // Poll every 10 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // Monitor unread count changes to trigger instant native browser notifications
+    const prevUnreadRef = useRef<number>(auth.unread_notifications_count || 0);
+    useEffect(() => {
+        const currentUnread = auth.unread_notifications_count || 0;
+        if (currentUnread > prevUnreadRef.current) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Pengumuman Baru!', {
+                    body: 'Ada pengumuman penting baru untuk Anda. Silakan klik ikon lonceng untuk membaca.',
+                });
+            }
+        }
+        prevUnreadRef.current = currentUnread;
+    }, [auth.unread_notifications_count]);
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'wfo':
@@ -69,9 +122,14 @@ export default function Dashboard({
                     </div>
                     <Link
                         href="/intern/announcements"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                     >
                         <Bell size={20} />
+                        {auth.unread_notifications_count !== undefined && auth.unread_notifications_count > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-slate-900 animate-pulse">
+                                {auth.unread_notifications_count}
+                            </span>
+                        )}
                     </Link>
                 </div>
 
@@ -94,7 +152,7 @@ export default function Dashboard({
                                         {item.title}
                                     </h3>
                                     <p className="text-xs text-gray-600 dark:text-slate-400 line-clamp-2">
-                                        {item.content}
+                                        {item.content ? item.content.replace(/<[^>]*>?/gm, '') : ''}
                                     </p>
                                     <p className="mt-2 text-[10px] text-gray-400 dark:text-slate-500">
                                         {new Date(

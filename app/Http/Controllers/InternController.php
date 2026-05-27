@@ -294,4 +294,50 @@ class InternController extends Controller
             'attendances' => $attendances,
         ]);
     }
+
+    /**
+     * Display announcements and notifications for the intern.
+     */
+    public function announcements(Request $request)
+    {
+        $user = $request->user()->load('division');
+
+        // Fetch announcements: either global or specific to the user's division
+        $announcements = Announcement::with(['author', 'division'])
+            ->where(function ($query) use ($user) {
+                $query->whereNull('division_id')
+                    ->orWhere('division_id', $user->division_id);
+            })
+            ->latest()
+            ->get();
+
+        // Fetch user notifications
+        $notifications = $user->notifications()->latest()->get();
+
+        return Inertia::render('Intern/Announcements/Index', [
+            'announcements' => $announcements,
+            'notifications' => $notifications,
+        ]);
+    }
+
+    /**
+     * Mark all notifications as read.
+     */
+    public function markAllNotificationsRead(Request $request): RedirectResponse
+    {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back()->with('success', 'Semua notifikasi ditandai telah dibaca.');
+    }
+
+    /**
+     * Mark a single notification as read.
+     */
+    public function markNotificationRead(Request $request, string $id): RedirectResponse
+    {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+
+        return back()->with('success', 'Notifikasi ditandai telah dibaca.');
+    }
 }

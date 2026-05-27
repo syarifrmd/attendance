@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
-import { useState } from 'react';
-import { Megaphone, Plus, Trash2, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Megaphone, Plus, Trash2, X, FileText, Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
 
 interface Division {
     id: string;
@@ -14,13 +14,109 @@ interface Announcement {
     content: string;
     division_id: string | null;
     created_at: string;
+    attachment_path: string | null;
+    attachment_name: string | null;
+    attachment_url: string | null;
     division?: Division;
     author?: { name: string };
 }
 
+// Custom Zero-Dependency, React 19 & SSR safe Rich Text Editor
+function RichEditor({ 
+    onChange, 
+    placeholder, 
+    editorKey 
+}: { 
+    onChange: (val: string) => void; 
+    placeholder: string;
+    editorKey: string;
+}) {
+    const editorRef = useRef<HTMLDivElement>(null);
+
+    const handleCommand = (command: string) => {
+        document.execCommand(command, false);
+        if (editorRef.current) {
+            onChange(editorRef.current.innerHTML);
+        }
+    };
+
+    return (
+        <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white text-slate-900 flex flex-col">
+            {/* Toolbar */}
+            <div className="flex items-center gap-1 bg-slate-50 border-b border-slate-200 p-1.5 flex-wrap">
+                <button
+                    type="button"
+                    onClick={() => handleCommand('bold')}
+                    className="p-1.5 rounded hover:bg-slate-200 transition-colors text-slate-700 hover:text-slate-900"
+                    title="Bold"
+                >
+                    <Bold size={14} />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => handleCommand('italic')}
+                    className="p-1.5 rounded hover:bg-slate-200 transition-colors text-slate-700 hover:text-slate-900"
+                    title="Italic"
+                >
+                    <Italic size={14} />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => handleCommand('underline')}
+                    className="p-1.5 rounded hover:bg-slate-200 transition-colors text-slate-700 hover:text-slate-900"
+                    title="Underline"
+                >
+                    <Underline size={14} />
+                </button>
+                <span className="w-[1px] h-4 bg-slate-300 mx-1" />
+                <button
+                    type="button"
+                    onClick={() => handleCommand('insertUnorderedList')}
+                    className="p-1.5 rounded hover:bg-slate-200 transition-colors text-slate-700 hover:text-slate-900"
+                    title="Bullet List"
+                >
+                    <List size={14} />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => handleCommand('insertOrderedList')}
+                    className="p-1.5 rounded hover:bg-slate-200 transition-colors text-slate-700 hover:text-slate-900"
+                    title="Numbered List"
+                >
+                    <ListOrdered size={14} />
+                </button>
+            </div>
+
+            {/* Editable Content */}
+            <div
+                key={editorKey}
+                ref={editorRef}
+                contentEditable
+                onInput={(e) => onChange(e.currentTarget.innerHTML)}
+                className="rich-editor-content w-full min-h-[140px] max-h-[220px] overflow-y-auto p-3 outline-none text-sm leading-relaxed"
+                placeholder={placeholder}
+            />
+
+            <style>{`
+                .rich-editor-content:empty:before {
+                    content: attr(placeholder);
+                    color: #94a3b8;
+                    cursor: text;
+                }
+            `}</style>
+        </div>
+    );
+}
+
 export default function AnnouncementsIndex({ announcements, divisions }: { announcements: Announcement[], divisions: Division[] }) {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [addForm, setAddForm] = useState({ title: '', content: '', division_id: '' });
+    const [editorResetKey, setEditorResetKey] = useState(0);
+    const [addForm, setAddForm] = useState<{
+        title: string;
+        content: string;
+        division_id: string;
+        attachment: File | null;
+    }>({ title: '', content: '', division_id: '', attachment: null });
     const [addLoading, setAddLoading] = useState(false);
 
     const submitAdd = (e: React.FormEvent) => {
@@ -30,10 +126,12 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
             title: addForm.title,
             content: addForm.content,
             division_id: addForm.division_id || null,
+            attachment: addForm.attachment,
         }, {
             onSuccess: () => {
                 setIsAddModalOpen(false);
-                setAddForm({ title: '', content: '', division_id: '' });
+                setAddForm({ title: '', content: '', division_id: '', attachment: null });
+                setEditorResetKey(prev => prev + 1);
                 setAddLoading(false);
             },
             onError: () => setAddLoading(false),
@@ -43,6 +141,12 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
     const deleteAnnouncement = (id: string) => {
         if (!confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) return;
         router.delete(`/mentor/announcements/${id}`);
+    };
+
+    const handleOpenModal = () => {
+        setAddForm({ title: '', content: '', division_id: '', attachment: null });
+        setEditorResetKey(prev => prev + 1);
+        setIsAddModalOpen(true);
     };
 
     return (
@@ -60,7 +164,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                         </p>
                     </div>
                     <button
-                        onClick={() => setIsAddModalOpen(true)}
+                        onClick={handleOpenModal}
                         className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600"
                     >
                         <Plus size={18} />
@@ -83,9 +187,30 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                     </button>
                                 </div>
                                 <h3 className="mt-3 text-base font-bold text-slate-900 dark:text-slate-100">{announcement.title}</h3>
-                                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
-                                    {announcement.content}
-                                </p>
+                                <div 
+                                    className="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-3 rich-content"
+                                    dangerouslySetInnerHTML={{ __html: announcement.content }}
+                                />
+                                
+                                <style>{`
+                                    .rich-content ul { list-style-type: disc; margin-left: 1rem; }
+                                    .rich-content ol { list-style-type: decimal; margin-left: 1rem; }
+                                    .rich-content strong { font-weight: bold; }
+                                `}</style>
+
+                                {announcement.attachment_url && (
+                                    <div className="mt-3 border-t border-slate-100 pt-2.5 dark:border-slate-800">
+                                        <a 
+                                            href={announcement.attachment_url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                                        >
+                                            <FileText size={14} />
+                                            <span className="truncate max-w-[180px]">{announcement.attachment_name}</span>
+                                        </a>
+                                    </div>
+                                )}
                             </div>
                             <div className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400 flex justify-between items-center">
                                 <span>{new Date(announcement.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -110,7 +235,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                 <X size={20} />
                             </button>
                         </div>
-                        <form onSubmit={submitAdd} className="p-6 space-y-4">
+                        <form onSubmit={submitAdd} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">Target Divisi</label>
                                 <select
@@ -137,14 +262,21 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">Isi Pengumuman *</label>
-                                <textarea
-                                    required
-                                    rows={5}
-                                    value={addForm.content}
-                                    onChange={e => setAddForm({ ...addForm, content: e.target.value })}
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                                    placeholder="Tuliskan detail pengumuman..."
+                                <RichEditor
+                                    editorKey={editorResetKey.toString()}
+                                    onChange={(val) => setAddForm({ ...addForm, content: val })}
+                                    placeholder="Tuliskan detail pengumuman terformat..."
                                 />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">Lampiran Berkas (Gambar/Dokumen - Opsional)</label>
+                                <input
+                                    type="file"
+                                    onChange={e => setAddForm({ ...addForm, attachment: e.target.files ? e.target.files[0] : null })}
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 file:mr-4 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-700 dark:file:text-indigo-400"
+                                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                                />
+                                <p className="mt-1 text-[10px] text-slate-400">Format: JPG, PNG, PDF, Word, Excel. Maksimal 5MB.</p>
                             </div>
                             <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
                                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</button>

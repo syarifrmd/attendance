@@ -61,6 +61,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
             Route::post('attendance/{attendance}/checkout', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
             Route::get('attendance/history', [InternController::class, 'history'])->name('attendance.history');
+
+            Route::get('announcements', [InternController::class, 'announcements'])->name('announcements');
+            Route::post('notifications/mark-all-read', [InternController::class, 'markAllNotificationsRead'])->name('notifications.mark-all-read');
+            Route::post('notifications/{id}/mark-read', [InternController::class, 'markNotificationRead'])->name('notifications.mark-read');
         });
     });
 
