@@ -14,7 +14,6 @@ beforeEach(function () {
         'start_time' => '08:00:00',
         'end_time' => '17:00:00',
         'work_days' => ['mon', 'tue', 'wed', 'thu', 'fri'],
-        'internship_duration_days' => 90,
         'mentor_name' => 'Test Mentor',
     ]);
 });
@@ -25,29 +24,29 @@ it('admin can create an intern draft', function () {
     $response = $this->actingAs($this->admin)
         ->post('/mentor/intern-drafts', [
             'nim' => 'NIM123456',
-            'nama_lengkap' => 'Intern Baru',
+            'name' => 'Intern Baru',
             'division_id' => $this->division->id,
             'internship_duration_days' => 90,
         ]);
 
     $response->assertRedirect();
-    $this->assertDatabaseHas('intern_drafts', ['nim' => 'NIM123456', 'nama_lengkap' => 'Intern Baru']);
+    $this->assertDatabaseHas('intern_drafts', ['nim' => 'NIM123456', 'name' => 'Intern Baru']);
 });
 
 it('cannot create intern draft with duplicate NIM', function () {
-    InternDraft::create(['nim' => 'DUPNIM', 'nama_lengkap' => 'First', 'internship_duration_days' => 90]);
+    InternDraft::create(['nim' => 'DUPNIM', 'name' => 'First', 'internship_duration_days' => 90]);
 
     $response = $this->actingAs($this->admin)
         ->post('/mentor/intern-drafts', [
             'nim' => 'DUPNIM',
-            'nama_lengkap' => 'Another Intern',
+            'name' => 'Another Intern',
         ]);
 
     $response->assertSessionHasErrors(['nim']);
 });
 
 it('admin can delete an intern draft', function () {
-    $draft = InternDraft::create(['nim' => 'DEL123', 'nama_lengkap' => 'To Delete', 'internship_duration_days' => 90]);
+    $draft = InternDraft::create(['nim' => 'DEL123', 'name' => 'To Delete', 'internship_duration_days' => 90]);
 
     $response = $this->actingAs($this->admin)
         ->delete("/mentor/intern-drafts/{$draft->id}");
@@ -58,7 +57,7 @@ it('admin can delete an intern draft', function () {
 
 it('intern cannot access intern draft routes', function () {
     $this->actingAs($this->intern)
-        ->post('/mentor/intern-drafts', ['nim' => 'X', 'nama_lengkap' => 'X'])
+        ->post('/mentor/intern-drafts', ['nim' => 'X', 'name' => 'X'])
         ->assertStatus(403);
 });
 
@@ -85,19 +84,19 @@ it('returns 404 when trying to view a mentor as an intern detail', function () {
 it('admin can update intern profile data', function () {
     $response = $this->actingAs($this->admin)
         ->patch("/mentor/interns/{$this->intern->id}", [
-            'nama_lengkap' => 'Updated Name',
+            'name' => 'Updated Name',
             'division_id' => $this->division->id,
         ]);
 
     $response->assertRedirect();
-    $this->assertDatabaseHas('profiles', ['nama_lengkap' => 'Updated Name']);
+    $this->assertDatabaseHas('users', ['name' => 'Updated Name']);
 });
 
 it('cannot update a mentor user via intern endpoint', function () {
     $mentor = User::factory()->create(['role' => Role::Mentor]);
 
     $this->actingAs($this->admin)
-        ->patch("/mentor/interns/{$mentor->id}", ['nama_lengkap' => 'Hacked'])
+        ->patch("/mentor/interns/{$mentor->id}", ['name' => 'Hacked'])
         ->assertNotFound();
 });
 

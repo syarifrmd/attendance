@@ -9,7 +9,7 @@ class InternDraft extends Model
 {
     protected $fillable = [
         'nim',
-        'nama_lengkap',
+        'name',
         'division_id',
         'internship_duration_days',
         'is_claimed',

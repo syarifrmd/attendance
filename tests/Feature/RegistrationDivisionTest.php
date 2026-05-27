@@ -20,6 +20,5 @@ test('registration requires division and creates profile', function () {
     $user = User::query()->where('email', 'intern@example.com')->first();
 
     expect($user)->not->toBeNull();
-    expect($user->profile)->not->toBeNull();
-    expect($user->profile->division_id)->toEqual($division->id);
+    expect($user->division_id)->toEqual($division->id);
 });

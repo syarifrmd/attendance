@@ -18,7 +18,6 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->json('work_days');
-            $table->unsignedSmallInteger('internship_duration_days');
             $table->string('mentor_name')->nullable();
             $table->timestamps();
         });

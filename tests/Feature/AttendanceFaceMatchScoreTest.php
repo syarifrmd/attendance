@@ -19,7 +19,7 @@ it('stores face_match_score when submitting wfo attendance', function () {
         'face_match_score' => '0.3500',
     ]);
 
-    $response->assertRedirect(route('intern.dashboard'));
+    $response->assertRedirect(route('intern.attendance.create'));
 
     $this->assertDatabaseHas('attendances', [
         'user_id' => $user->id,
@@ -51,7 +51,7 @@ it('allows null face_match_score for izin status', function () {
         'reason' => 'Sakit demam tinggi',
     ]);
 
-    $response->assertRedirect(route('intern.dashboard'));
+    $response->assertRedirect(route('intern.attendance.create'));
 
     $this->assertDatabaseHas('attendances', [
         'user_id' => $user->id,

@@ -49,7 +49,7 @@ export default function SetupProfile({
         foto: null as File | null,
         foto_left: null as File | null,
         foto_right: null as File | null,
-        nama_lengkap: existingProfile?.nama_lengkap || userName || '',
+        name: userName || '',
         asal_kampus: existingProfile?.asal_kampus || '',
         division_id: existingProfile?.division_id || '',
         internship_duration_days: existingProfile?.internship_duration_days || 90,
@@ -453,23 +453,23 @@ export default function SetupProfile({
         <MobileLayout title="Setup Profil" showBottomNav={false}>
             <Toaster position="top-center" />
             <div className="mb-4">
-                <h1 className="mb-1 text-xl font-bold text-gray-900">
+                <h1 className="mb-1 text-xl font-bold text-gray-900 dark:text-slate-100">
                     Setup Profil Anda
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                     Satu langkah lagi! Lengkapi profil dan ambil foto wajah untuk keperluan absensi.
                 </p>
             </div>
 
             <form onSubmit={submitProfile} className="space-y-5 pb-8">
                 {/* Face Verification Section */}
-                <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <div className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-4">
                     <div className="mb-3 flex items-center justify-between">
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-900">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                                 Foto Wajah (Wajib)
                             </h3>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
                                 {!modelsLoaded && modelLoadProgress
                                     ? modelLoadProgress
                                     : modelsLoaded
@@ -484,7 +484,7 @@ export default function SetupProfile({
                                 type="button"
                                 onClick={() => startCamera()}
                                 disabled={!modelsLoaded}
-                                className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 disabled:opacity-50"
+                                className="rounded-lg bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-500/20 disabled:opacity-50"
                             >
                                 Buka Kamera
                             </button>
@@ -521,7 +521,7 @@ export default function SetupProfile({
                                         className="w-full rounded-lg border-none bg-black/50 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm focus:ring-2 focus:ring-white/50 appearance-none"
                                     >
                                         {cameras.map((cam, idx) => (
-                                            <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900">
+                                            <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900 dark:text-white dark:bg-slate-800">
                                                 {cam.label || `Camera ${idx + 1}`}
                                             </option>
                                         ))}
@@ -549,13 +549,13 @@ export default function SetupProfile({
 
                     {/* Success state */}
                     {captureComplete && (
-                        <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
-                            <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600" />
+                        <div className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-800/40 bg-green-50 dark:bg-green-950/20 p-3">
+                            <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-green-800">
+                                <p className="text-sm font-medium text-green-800 dark:text-green-200">
                                     Foto Tersimpan
                                 </p>
-                                <p className="text-xs text-green-600">
+                                <p className="text-xs text-green-600 dark:text-green-400/80">
                                     3 pose wajah siap digunakan untuk absensi.
                                 </p>
                             </div>
@@ -568,14 +568,14 @@ export default function SetupProfile({
                                     setCaptureStep('straight');
                                     startCamera();
                                 }}
-                                className="text-xs font-medium text-green-700 underline"
+                                className="text-xs font-medium text-green-700 dark:text-green-400 underline"
                             >
                                 Ganti Foto
                             </button>
                         </div>
                     )}
                     {!captureComplete && captureCount > 0 && (
-                        <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-xs text-yellow-700">
+                        <div className="mt-3 rounded-lg border border-yellow-200 dark:border-yellow-800/40 bg-yellow-50 dark:bg-yellow-950/20 p-3 text-xs text-yellow-700 dark:text-yellow-400">
                             {`Progress: ${captureCount}/3 pose tersimpan. Pastikan menyelesaikan sampai kanan.`}
                         </div>
                     )}
@@ -597,32 +597,32 @@ export default function SetupProfile({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                         Nama Lengkap (Wajib)
                     </label>
                     <input
                         type="text"
-                        value={data.nama_lengkap}
-                        onChange={(e) => setData('nama_lengkap', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="Masukkan nama lengkap Anda"
                     />
-                    {errors.nama_lengkap && (
-                        <p className="mt-1 text-xs text-red-500">
-                            {errors.nama_lengkap}
+                    {errors.name && (
+                        <p className="mt-1 text-xs text-rose-500">
+                            {errors.name}
                         </p>
                     )}
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                         Asal Kampus / Sekolah
                     </label>
                     <input
                         type="text"
                         value={data.asal_kampus}
                         onChange={(e) => setData('asal_kampus', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="Universitas / SMK asal"
                     />
                     {errors.asal_kampus && (
@@ -633,18 +633,18 @@ export default function SetupProfile({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                         Divisi Penempatan (Wajib)
                     </label>
                     <select
                         value={data.division_id}
                         onChange={(e) => setData('division_id', e.target.value)}
                         required
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     >
-                        <option value="">Pilih Divisi...</option>
+                        <option value="" className="text-gray-900 dark:text-slate-400 dark:bg-slate-800">Pilih Divisi...</option>
                         {divisions.map((d) => (
-                            <option key={d.id} value={d.id}>
+                            <option key={d.id} value={d.id} className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">
                                 Divisi {d.name}
                             </option>
                         ))}
@@ -657,7 +657,7 @@ export default function SetupProfile({
                 </div>
 
                 <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                         Durasi Magang (Hari)
                     </label>
                     <input
@@ -666,7 +666,7 @@ export default function SetupProfile({
                         max="365"
                         value={data.internship_duration_days}
                         onChange={(e) => setData('internship_duration_days', parseInt(e.target.value) || 0)}
-                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="Contoh: 90"
                     />
                     {errors.internship_duration_days && (

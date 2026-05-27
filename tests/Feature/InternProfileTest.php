@@ -14,31 +14,30 @@ test('intern can store profile with side photos', function () {
         'foto' => UploadedFile::fake()->image('front.jpg'),
         'foto_left' => UploadedFile::fake()->image('left.jpg'),
         'foto_right' => UploadedFile::fake()->image('right.jpg'),
-        'nama_lengkap' => 'Nadia Pratama',
+        'name' => 'Nadia Pratama',
         'asal_kampus' => 'Universitas Contoh',
         'divisi' => 'Web Developer',
+        'internship_duration_days' => 90,
     ]);
 
     $response->assertRedirect(route('intern.dashboard'));
 
-    $profile = $user->refresh()->profile;
-    expect($profile)->not->toBeNull();
-    expect($profile->foto)->not->toBeNull();
-    expect($profile->foto_left)->not->toBeNull();
-    expect($profile->foto_right)->not->toBeNull();
+    $user->refresh();
+    expect($user->foto)->not->toBeNull();
+    expect($user->foto_left)->not->toBeNull();
+    expect($user->foto_right)->not->toBeNull();
 
-    Storage::disk('public')->assertExists($profile->foto);
-    Storage::disk('public')->assertExists($profile->foto_left);
-    Storage::disk('public')->assertExists($profile->foto_right);
+    Storage::disk('public')->assertExists($user->foto);
+    Storage::disk('public')->assertExists($user->foto_left);
+    Storage::disk('public')->assertExists($user->foto_right);
 });
 
 test('attendance form receives profile face list', function () {
-    $user = User::factory()->create();
-    $user->profile()->create([
+    $user = User::factory()->create([
         'foto' => 'profiles/front.jpg',
         'foto_left' => 'profiles/left.jpg',
         'foto_right' => 'profiles/right.jpg',
-        'nama_lengkap' => 'Nadia Pratama',
+        'name' => 'Nadia Pratama',
         'asal_kampus' => 'Universitas Contoh',
         'divisi' => 'Web Developer',
     ]);

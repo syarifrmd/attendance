@@ -1,15 +1,11 @@
 <?php
 
-use App\Models\Profile;
 use App\Models\User;
 
 test('onsite attendance requires face verification image and location', function () {
-    $user = User::factory()->create();
-
-    Profile::create([
-        'user_id' => $user->id,
+    $user = User::factory()->create([
         'foto' => 'profiles/sample.jpg',
-        'nama_lengkap' => 'Test User',
+        'name' => 'Test User',
         'asal_kampus' => 'Test Campus',
         'divisi' => 'Test Division',
     ]);
@@ -22,12 +18,9 @@ test('onsite attendance requires face verification image and location', function
 });
 
 test('offsite attendance requires proof image and reason', function () {
-    $user = User::factory()->create();
-
-    Profile::create([
-        'user_id' => $user->id,
+    $user = User::factory()->create([
         'foto' => 'profiles/sample.jpg',
-        'nama_lengkap' => 'Test User',
+        'name' => 'Test User',
         'asal_kampus' => 'Test Campus',
         'divisi' => 'Test Division',
     ]);

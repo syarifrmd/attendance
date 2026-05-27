@@ -46,12 +46,11 @@ interface Intern {
     name: string;
     email: string;
     profile: {
-        nama_lengkap: string;
         asal_kampus: string | null;
         foto: string | null;
         division: Division | null;
         divisi: string | null;
-        periode_magang: string | null;
+        internship_duration_days: number | null;
     } | null;
 }
 
@@ -89,7 +88,7 @@ export default function AdminInternShow({ intern, attendances, division, filters
     const [status, setStatus] = useState(filters.status ?? '');
     const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
-    const displayName = intern.profile?.nama_lengkap || intern.name;
+    const displayName = intern.name;
     const avatarSrc = intern.profile?.foto
         ? `/storage/${intern.profile.foto}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
@@ -140,11 +139,9 @@ export default function AdminInternShow({ intern, attendances, division, filters
                         <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-medium text-slate-600">
                             {intern.profile?.asal_kampus || '-'}
                         </span>
-                        {intern.profile?.periode_magang && (
-                            <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-medium text-slate-600">
-                                Periode: {intern.profile.periode_magang}
-                            </span>
-                        )}
+                        <span className="rounded-full bg-slate-100 px-3 py-0.5 text-xs font-medium text-slate-600">
+                            Durasi: {intern.profile?.internship_duration_days || 0} Hari
+                        </span>
                     </div>
                     {division && (
                         <p className="mt-1.5 text-xs text-slate-400">

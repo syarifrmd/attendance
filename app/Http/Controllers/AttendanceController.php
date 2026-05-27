@@ -15,13 +15,12 @@ class AttendanceController extends Controller
      */
     public function create(Request $request)
     {
-        $user = $request->user()->load('profile.division');
-        $profile = $user->profile;
+        $user = $request->user()->load('division');
 
         $profileFaces = collect([
-            $profile?->foto,
-            $profile?->foto_left,
-            $profile?->foto_right,
+            $user?->foto,
+            $user?->foto_left,
+            $user?->foto_right,
         ])->filter()->values()->all();
 
         // Get today's attendance record (any status)
@@ -30,7 +29,7 @@ class AttendanceController extends Controller
             ->latest()
             ->first();
 
-        $division = $profile?->division;
+        $division = $user?->division;
         $workSchedule = null;
 
         if ($division) {
@@ -62,7 +61,7 @@ class AttendanceController extends Controller
     public function store(AttendanceRequest $request)
     {
         $validated = $request->validated();
-        $user = $request->user()->load('profile.division');
+        $user = $request->user()->load('division');
 
         $face_verification_path = null;
         $proof_image_path = null;
@@ -108,8 +107,8 @@ class AttendanceController extends Controller
             return back()->withErrors(['checkout' => 'Presensi pulang sudah direkam sebelumnya.']);
         }
 
-        $user = $request->user()->load('profile.division');
-        $division = $user->profile?->division;
+        $user = $request->user()->load('division');
+        $division = $user->division;
         $now = Carbon::now();
 
         // Validate early checkout reason

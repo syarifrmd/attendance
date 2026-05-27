@@ -51,8 +51,7 @@ class SocialAuthController extends Controller
         Auth::login($user, true);
 
         if ($user->role === Role::Intern) {
-            $profile = $user->profile;
-            if (! $profile || empty($profile->nim) || ! $profile->nim_verified_at) {
+            if (empty($user->nim) || ! $user->nim_verified_at) {
                 $user->notify(new VerifyAccountNotification);
 
                 return redirect()->route('intern.verify-notice');

@@ -25,7 +25,7 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
     // Mapping state
     const [mapping, setMapping] = useState({
         nim: '',
-        nama_lengkap: '',
+        name: '',
         division: '',
         duration: '',
         is_active: ''
@@ -62,11 +62,11 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
                     setRawData(dataRows);
 
                     // Auto-detect columns based on common names
-                    const newMapping = { nim: '', nama_lengkap: '', division: '', duration: '', is_active: '' };
+                    const newMapping = { nim: '', name: '', division: '', duration: '', is_active: '' };
                     parsedHeaders.forEach(h => {
                         const hLower = h.toLowerCase();
                         if (hLower.includes('nim') || hLower.includes('induk')) newMapping.nim = h;
-                        if (hLower.includes('nama')) newMapping.nama_lengkap = h;
+                        if (hLower.includes('nama')) newMapping.name = h;
                         if (hLower.includes('divisi')) newMapping.division = h;
                         if (hLower.includes('durasi') || hLower.includes('waktu')) newMapping.duration = h;
                         if (hLower.includes('aktif') || hLower.includes('status')) newMapping.is_active = h;
@@ -83,7 +83,7 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
     };
 
     const handleMappingSubmit = () => {
-        if (!mapping.nim || !mapping.nama_lengkap) {
+        if (!mapping.nim || !mapping.name) {
             alert("Kolom NIM dan Nama Lengkap wajib dipetakan!");
             return;
         }
@@ -105,13 +105,13 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
 
             return {
                 nim: String(getColValue(mapping.nim) || ''),
-                nama_lengkap: String(getColValue(mapping.nama_lengkap) || ''),
+                name: String(getColValue(mapping.name) || ''),
                 division_id: divObj?.id || null,
                 division_name: divName || '-',
                 internship_duration_days: parseInt(getColValue(mapping.duration) || '90') || 90,
                 is_active: isActive
             };
-        }).filter(item => item.nim && item.nama_lengkap);
+        }).filter(item => item.nim && item.name);
 
         setPreviewData(mapped);
         setStep(3);
@@ -122,7 +122,7 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
         router.post('/mentor/intern-drafts/import', {
             drafts: previewData.map(p => ({
                 nim: p.nim,
-                nama_lengkap: p.nama_lengkap,
+                name: p.name,
                 division_id: p.division_id,
                 internship_duration_days: p.internship_duration_days,
                 is_active: p.is_active
@@ -204,7 +204,7 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
                             <div className="grid gap-4">
                                 {[
                                     { id: 'nim', label: 'NIM (Nomor Induk) *', req: true },
-                                    { id: 'nama_lengkap', label: 'Nama Lengkap *', req: true },
+                                    { id: 'name', label: 'Nama Lengkap *', req: true },
                                     { id: 'division', label: 'Divisi (Opsional)', req: false },
                                     { id: 'duration', label: 'Durasi Magang (Hari) (Opsional)', req: false },
                                     { id: 'is_active', label: 'Status Aktif (Opsional)', req: false },
@@ -258,7 +258,7 @@ export default function ImportInternModal({ divisions, onClose }: ImportInternMo
                                         {previewData.slice(0, 5).map((row, i) => (
                                             <tr key={i} className="bg-white dark:bg-slate-800">
                                                 <td className="px-4 py-3 font-mono text-xs font-medium text-indigo-600 dark:text-indigo-400">{row.nim}</td>
-                                                <td className="px-4 py-3">{row.nama_lengkap}</td>
+                                                <td className="px-4 py-3">{row.name}</td>
                                                 <td className="px-4 py-3">{row.division_name}</td>
                                                 <td className="px-4 py-3">
                                                     {row.division_id ? (

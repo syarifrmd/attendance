@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('intern_drafts', function (Blueprint $table) {
             $table->id();
             $table->string('nim')->unique();
-            $table->string('nama_lengkap');
+            $table->string('name');
             $table->foreignUlid('division_id')->nullable()->constrained()->nullOnDelete();
             $table->integer('internship_duration_days')->default(90);
             $table->boolean('is_claimed')->default(false);

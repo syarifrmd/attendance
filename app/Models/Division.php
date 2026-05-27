@@ -22,8 +22,8 @@ class Division extends Model
         ];
     }
 
-    public function profiles(): HasMany
+    public function users(): HasMany
     {
-        return $this->hasMany(Profile::class);
+        return $this->hasMany(User::class);
     }
 }

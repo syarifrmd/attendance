@@ -34,6 +34,7 @@ class CreateNewUser implements CreatesNewUsers
                 'email' => $input['email'],
                 'password' => $input['password'],
                 'role' => Role::Intern,
+                'division_id' => $input['division_id'] ?? null,
             ]);
 
             $user->notify(new VerifyAccountNotification);

@@ -15,9 +15,23 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
-            $table->enum('role', ['intern', 'mentor'])->default('intern');
+            $table->enum('role', ['intern', 'mentor', 'admin'])->default('intern');
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->string('google_id')->nullable()->unique();
+
+            // Merged profile fields
+            $table->string('nim')->nullable()->unique();
+            $table->timestamp('nim_verified_at')->nullable();
+            $table->string('foto')->nullable();
+            $table->string('foto_left')->nullable();
+            $table->string('foto_right')->nullable();
+            $table->string('asal_kampus')->nullable();
+            $table->string('divisi')->nullable();
+            $table->ulid('division_id')->nullable();
+            $table->ulid('mentor_id')->nullable();
+            $table->integer('internship_duration_days')->nullable()->default(90);
+
             $table->rememberToken();
             $table->timestamps();
         });

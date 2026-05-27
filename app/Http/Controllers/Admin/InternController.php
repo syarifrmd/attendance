@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Division;
 use App\Models\InternDraft;
-use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,7 +47,7 @@ class InternController extends Controller
             : Carbon::today();
 
         $query = User::where('role', 'intern')
-            ->with(['profile.division'])
+            ->with(['division'])
             ->withCount([
                 'attendances as total_checkins' => fn ($q) => $q->whereIn('status', ['wfo', 'wfh', 'wfa']),
                 'attendances as total_absent' => fn ($q) => $q->whereIn('status', ['izin', 'sakit']),
@@ -57,15 +56,15 @@ class InternController extends Controller
                         ->whereNotNull('check_in_at')
                         ->whereRaw('TIME(check_in_at) > (
                             SELECT d.start_time FROM divisions d
-                            INNER JOIN profiles p ON p.division_id = d.id
-                            WHERE p.user_id = attendances.user_id
+                            INNER JOIN users u ON u.division_id = d.id
+                            WHERE u.id = attendances.user_id
                             LIMIT 1
                         )');
                 },
             ]);
 
         if ($request->filled('division_id')) {
-            $query->whereHas('profile', fn ($q) => $q->where('division_id', $request->division_id));
+            $query->where('division_id', $request->division_id);
         }
 
         if ($request->filled('search')) {
@@ -73,7 +72,7 @@ class InternController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('profile', fn ($pq) => $pq->where('nama_lengkap', 'like', "%{$search}%"));
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -97,7 +96,7 @@ class InternController extends Controller
 
         $interns->getCollection()->transform(function (User $intern) use ($dateAttendances) {
             $att = $dateAttendances->get($intern->id);
-            $division = $intern->profile?->division;
+            $division = $intern->division;
 
             $late = $att ? $this->lateMeta($att, $division) : ['is_late' => false, 'late_minutes' => 0, 'late_level' => 'green'];
             $noCheckout = $att && in_array($att->status, ['wfo', 'wfh', 'wfa']) && is_null($att->check_out_at);
@@ -140,7 +139,7 @@ class InternController extends Controller
     {
         abort_if($intern->isManager() || $intern->isIntern() === false, 404);
 
-        $intern->load('profile.division');
+        $intern->load('division');
 
         $query = $intern->attendances()->latest();
 
@@ -155,7 +154,7 @@ class InternController extends Controller
         }
 
         $attendances = $query->paginate(20)->withQueryString();
-        $division = $intern->profile?->division;
+        $division = $intern->division;
 
         $attendances->getCollection()->transform(function (Attendance $att) use ($division) {
             $late = $this->lateMeta($att, $division);
@@ -194,10 +193,9 @@ class InternController extends Controller
         abort_if($intern->isManager() || $intern->isIntern() === false, 404);
 
         $validated = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'asal_kampus' => 'nullable|string|max:255',
             'division_id' => 'nullable|exists:divisions,id',
-            'periode_magang' => 'nullable|string|max:255',
             'internship_duration_days' => 'nullable|integer|min:1|max:730',
             'email' => 'sometimes|email|max:255|unique:users,email,'.$intern->id,
         ]);
@@ -206,21 +204,15 @@ class InternController extends Controller
             $intern->update(['email' => $validated['email']]);
         }
 
-        $profile = $intern->profile()->firstOrCreate(
-            ['user_id' => $intern->id],
-            ['nama_lengkap' => $validated['nama_lengkap']]
-        );
-
         $divisionId = $validated['division_id'] ?? null;
-        $divisionName = $divisionId ? Division::find($divisionId)?->name : $profile->divisi;
+        $divisionName = $divisionId ? Division::find($divisionId)?->name : $intern->divisi;
 
-        $profile->update([
-            'nama_lengkap' => $validated['nama_lengkap'],
-            'asal_kampus' => $validated['asal_kampus'] ?? $profile->asal_kampus,
+        $intern->update([
+            'name' => $validated['name'],
+            'asal_kampus' => $validated['asal_kampus'] ?? $intern->asal_kampus,
             'division_id' => $divisionId,
             'divisi' => $divisionName,
-            'periode_magang' => $validated['periode_magang'] ?? $profile->periode_magang,
-            'internship_duration_days' => $validated['internship_duration_days'] ?? $profile->internship_duration_days ?? 90,
+            'internship_duration_days' => $validated['internship_duration_days'] ?? $intern->internship_duration_days ?? 90,
         ]);
 
         return back()->with('success', 'Data intern berhasil diperbarui.');
@@ -245,7 +237,7 @@ class InternController extends Controller
     {
         $validated = $request->validate([
             'nim' => 'required|string|max:255',
-            'nama_lengkap' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'division_id' => 'nullable|exists:divisions,id',
             'internship_duration_days' => 'nullable|integer|min:1|max:730',
             'is_active' => 'boolean',
@@ -256,7 +248,7 @@ class InternController extends Controller
         if (! $isActive) {
             // Hard delete
             InternDraft::where('nim', $validated['nim'])->delete();
-            $user = Profile::where('nim', $validated['nim'])->first()?->user;
+            $user = User::where('nim', $validated['nim'])->first();
             if ($user && $user->role === Role::Intern) {
                 $user->delete();
             }
@@ -269,7 +261,7 @@ class InternController extends Controller
 
         InternDraft::create([
             'nim' => $validated['nim'],
-            'nama_lengkap' => $validated['nama_lengkap'],
+            'name' => $validated['name'],
             'division_id' => $validated['division_id'] ?? null,
             'internship_duration_days' => $validated['internship_duration_days'] ?? 90,
             'is_claimed' => false,
@@ -286,7 +278,7 @@ class InternController extends Controller
         $validated = $request->validate([
             'drafts' => 'required|array|min:1',
             'drafts.*.nim' => 'required|string|max:255',
-            'drafts.*.nama_lengkap' => 'required|string|max:255',
+            'drafts.*.name' => 'required|string|max:255',
             'drafts.*.division_id' => 'nullable|exists:divisions,id',
             'drafts.*.internship_duration_days' => 'nullable|integer|min:1|max:730',
             'drafts.*.is_active' => 'boolean',
@@ -301,7 +293,7 @@ class InternController extends Controller
             if (! $isActive) {
                 // Hard delete logic
                 $draftDeleted = InternDraft::where('nim', $draft['nim'])->delete();
-                $user = Profile::where('nim', $draft['nim'])->first()?->user;
+                $user = User::where('nim', $draft['nim'])->first();
                 if ($user && $user->role === Role::Intern) {
                     $user->delete();
                     $countDeleted++;
@@ -314,7 +306,7 @@ class InternController extends Controller
                 if (! $existsInDrafts) {
                     InternDraft::create([
                         'nim' => $draft['nim'],
-                        'nama_lengkap' => $draft['nama_lengkap'],
+                        'name' => $draft['name'],
                         'division_id' => $draft['division_id'] ?? null,
                         'internship_duration_days' => $draft['internship_duration_days'] ?? 90,
                         'is_claimed' => false,

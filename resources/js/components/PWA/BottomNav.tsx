@@ -28,7 +28,7 @@ export default function BottomNav() {
 
     return (
         <nav
-            className="fixed bottom-0 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 border-t border-gray-100 bg-white/95 backdrop-blur-lg"
+            className="fixed bottom-0 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 border-t border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg transition-colors duration-200"
             style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
         >
             <div className="flex items-center justify-around px-4 py-1">
@@ -45,13 +45,13 @@ export default function BottomNav() {
                                 <div
                                     className={`flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95 ${
                                         item.active
-                                            ? 'bg-indigo-600 shadow-indigo-300'
-                                            : 'bg-indigo-500 shadow-indigo-200'
-                                    } ring-4 ring-white`}
+                                            ? 'bg-indigo-600 shadow-indigo-300 dark:shadow-indigo-950/50'
+                                            : 'bg-indigo-500 shadow-indigo-200 dark:shadow-indigo-900/40'
+                                    } ring-4 ring-white dark:ring-slate-900`}
                                 >
                                     <Icon size={26} className="text-white" />
                                 </div>
-                                <span className="mt-0.5 text-[10px] font-semibold text-indigo-600">
+                                <span className="mt-0.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
                                     {item.name}
                                 </span>
                             </Link>
@@ -64,8 +64,8 @@ export default function BottomNav() {
                             href={item.href}
                             className={`flex flex-col items-center justify-center gap-0.5 rounded-xl px-4 py-2 transition-colors ${
                                 item.active
-                                    ? 'text-indigo-600'
-                                    : 'text-gray-400 hover:text-gray-600'
+                                    ? 'text-indigo-600 dark:text-indigo-400'
+                                    : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
                             }`}
                         >
                             <Icon

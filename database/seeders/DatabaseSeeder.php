@@ -5,12 +5,10 @@ namespace Database\Seeders;
 use App\Enums\Role;
 use App\Models\Attendance;
 use App\Models\Division;
-use App\Models\Profile;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -45,20 +43,27 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => Role::Mentor,
         ]);
-        // 2. Create Mentor / Admin User
-        $mentor = User::create([
+
+        $admin = User::create([
             'name' => 'Admin Indosat',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'role' => Role::Admin,
         ]);
 
-        // 3. Create Interns
+        // 3. Create Interns with direct fields
         $intern1 = User::create([
             'name' => 'Andi Intern',
             'email' => 'intern1@example.com',
             'password' => Hash::make('password'),
             'role' => Role::Intern,
+            'nim' => '1234567891',
+            'nim_verified_at' => now(),
+            'asal_kampus' => 'Universitas Diponegoro',
+            'divisi' => $itDiv->name,
+            'division_id' => $itDiv->id,
+            'mentor_id' => $mentor->id,
+            'internship_duration_days' => 90,
         ]);
 
         $intern2 = User::create([
@@ -66,31 +71,28 @@ class DatabaseSeeder extends Seeder
             'email' => 'intern2@example.com',
             'password' => Hash::make('password'),
             'role' => Role::Intern,
-        ]);
-
-        // 4. Create Profiles for Interns
-        Profile::create([
-            'id' => (string) Str::ulid(),
-            'user_id' => $intern1->id,
-            'nama_lengkap' => 'Andi Susanto',
-            'asal_kampus' => 'Universitas Diponegoro',
-            'divisi' => $itDiv->name,
-            'division_id' => $itDiv->id,
-            'mentor_id' => $mentor->id,
-            'periode_magang' => 'Agustus - November 2026',
-            'internship_duration_days' => 90,
-        ]);
-
-        Profile::create([
-            'id' => (string) Str::ulid(),
-            'user_id' => $intern2->id,
-            'nama_lengkap' => 'Sari Indah',
+            'nim' => '1234567892',
+            'nim_verified_at' => now(),
             'asal_kampus' => 'Universitas Negeri Semarang',
             'divisi' => $hrDiv->name,
             'division_id' => $hrDiv->id,
             'mentor_id' => $mentor->id,
-            'periode_magang' => 'September - Desember 2026',
             'internship_duration_days' => 60,
+        ]);
+
+        // Seed unverified intern for testing NIM Claim flow
+        User::create([
+            'name' => 'Mahasiswa Test Claim',
+            'email' => 'testclaim@example.com',
+            'password' => Hash::make('password'),
+            'role' => Role::Intern,
+            'nim' => '1234567890',
+            'nim_verified_at' => null, // Needs verification
+            'asal_kampus' => 'Universitas Contoh',
+            'divisi' => $itDiv->name,
+            'division_id' => $itDiv->id,
+            'mentor_id' => $mentor->id,
+            'internship_duration_days' => 90,
         ]);
 
         // 5. Create some dummy attendances for Andi

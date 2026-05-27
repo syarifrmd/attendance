@@ -520,13 +520,13 @@ export default function AttendanceForm({
     const renderWFORequirements = () => (
         <>
             {/* Geolocation Section */}
-            <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+            <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20 p-4">
                 <div className="mb-3 flex items-center justify-between">
                     <div>
-                        <h3 className="text-sm font-semibold text-blue-900">
+                        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-200">
                             Lokasi Saat Ini
                         </h3>
-                        <p className="text-xs text-blue-700/70">
+                        <p className="text-xs text-blue-700/70 dark:text-blue-400/80">
                             Diperlukan untuk validasi area
                         </p>
                     </div>
@@ -547,7 +547,7 @@ export default function AttendanceForm({
                     </button>
                 </div>
                 {data.latitude && (
-                    <p className="rounded bg-blue-100 p-2 font-mono text-xs text-blue-800">
+                    <p className="rounded bg-blue-100 dark:bg-blue-950/40 p-2 font-mono text-xs text-blue-800 dark:text-blue-300">
                         Lat: {data.latitude.substring(0, 10)}
                         <br />
                         Lng: {data.longitude.substring(0, 10)}
@@ -556,13 +556,13 @@ export default function AttendanceForm({
             </div>
 
             {/* Face Verification Section */}
-            <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <div className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-4">
                 <div className="mb-3 flex items-center justify-between">
                     <div>
-                        <h3 className="text-sm font-semibold text-gray-900">
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                             Verifikasi Wajah
                         </h3>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-slate-400">
                             {!modelsLoaded && modelLoadProgress
                                 ? modelLoadProgress
                                 : modelsLoaded
@@ -577,7 +577,7 @@ export default function AttendanceForm({
                             type="button"
                             onClick={() => startCamera()}
                             disabled={!modelsLoaded}
-                            className="rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-100 disabled:opacity-50"
+                            className="rounded-lg bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-500/20 disabled:opacity-50"
                         >
                             Buka Kamera
                         </button>
@@ -596,7 +596,7 @@ export default function AttendanceForm({
                             <div className="absolute top-2 right-2 left-2 z-10">
                                 <select value={selectedCameraId} onChange={handleCameraChange} className="w-full rounded-lg border-none bg-black/50 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm focus:ring-2 focus:ring-white/50 appearance-none">
                                     {cameras.map((cam, idx) => (
-                                        <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900">
+                                        <option key={cam.deviceId} value={cam.deviceId} className="text-gray-900 dark:text-white dark:bg-slate-800">
                                             {cam.label || `Camera ${idx + 1}`}
                                         </option>
                                     ))}
@@ -620,13 +620,13 @@ export default function AttendanceForm({
 
                 {/* Success state */}
                 {data.face_verification_image && (
-                    <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3">
-                        <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600" />
+                    <div className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-800/40 bg-green-50 dark:bg-green-950/20 p-3">
+                        <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-green-800">
+                            <p className="text-sm font-medium text-green-800 dark:text-green-200">
                                 Wajah Terverifikasi
                             </p>
-                            <p className="text-xs text-green-600">
+                            <p className="text-xs text-green-600 dark:text-green-400/80">
                                 Foto wajah berhasil diambil.
                             </p>
                         </div>
@@ -636,7 +636,7 @@ export default function AttendanceForm({
                                 setData('face_verification_image', null);
                                 startCamera();
                             }}
-                            className="text-xs font-medium text-green-700 underline"
+                            className="text-xs font-medium text-green-700 dark:text-green-400 underline"
                         >
                             Ulangi
                         </button>
@@ -650,22 +650,22 @@ export default function AttendanceForm({
         <MobileLayout title="Presensi">
             <Toaster position="top-center" />
             <div className="mb-4">
-                <h1 className="mb-1 text-xl font-bold text-gray-900">
+                <h1 className="mb-1 text-xl font-bold text-gray-900 dark:text-slate-100">
                     Presensi Hari Ini
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                     Pilih tipe kehadiran dan lengkapi data.
                 </p>
             </div>
 
             {/* Work Schedule Info */}
             {work_schedule && (
-                <div className="mb-4 flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 px-4 py-3">
+                <div className="mb-4 flex items-center gap-3 rounded-xl border border-indigo-100 dark:border-indigo-950 bg-indigo-50/60 dark:bg-indigo-950/20 px-4 py-3">
                     <Clock className="h-4 w-4 text-indigo-500" />
-                    <div className="text-xs text-indigo-700">
+                    <div className="text-xs text-indigo-700 dark:text-indigo-300">
                         <span className="font-semibold">Jam Kerja:</span>{' '}
                         {work_schedule.start_time} – {work_schedule.end_time}
-                        <span className="ml-2 text-indigo-400">
+                        <span className="ml-2 text-indigo-400 dark:text-indigo-400">
                             (Presensi pulang setelah jam {work_schedule.end_time})
                         </span>
                     </div>
@@ -674,12 +674,12 @@ export default function AttendanceForm({
 
             {/* Already Checked In – Show Check-Out Panel */}
             {today_attendance && ['wfo', 'wfh', 'wfa'].includes(today_attendance.status) && (
-                <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                <div className="mb-5 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20 p-5">
                     <div className="mb-3 flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                        <h2 className="font-semibold text-emerald-800">Presensi Masuk Tercatat</h2>
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                        <h2 className="font-semibold text-emerald-800 dark:text-emerald-200">Presensi Masuk Tercatat</h2>
                     </div>
-                    <div className="mb-1 flex items-center gap-2 text-sm text-emerald-700">
+                    <div className="mb-1 flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300">
                         <Clock className="h-4 w-4" />
                         <span>
                             Masuk:{' '}
@@ -702,12 +702,12 @@ export default function AttendanceForm({
                             </>
                         )}
                     </div>
-                    <p className="mb-4 text-xs text-emerald-600 flex items-center gap-2">
+                    <p className="mb-4 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                         <span>Status Kehadiran: <span className="font-bold uppercase">{today_attendance.status}</span></span>
                         {today_attendance.is_late !== undefined && (
-                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${today_attendance.late_level === 'green' ? 'bg-green-100 text-green-700' :
-                                    today_attendance.late_level === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700'
+                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${today_attendance.late_level === 'green' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400' :
+                                    today_attendance.late_level === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-400' :
+                                        'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400'
                                 }`}>
                                 {today_attendance.late_level === 'green' ? 'Tepat Waktu' : `Terlambat ${today_attendance.late_minutes}m`}
                             </span>
@@ -719,11 +719,11 @@ export default function AttendanceForm({
 
                             {!canCheckOut && minutesUntilEnd !== null && minutesUntilEnd > 0 && (
                                 <div className="space-y-3">
-                                    <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                                        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
-                                        <div className="text-xs text-amber-700">
-                                            <p className="font-semibold">Belum waktunya pulang</p>
-                                            <p>
+                                    <div className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-800/40 bg-amber-50 dark:bg-amber-950/20 px-4 py-3">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                                        <div className="text-xs text-amber-700 dark:text-amber-300">
+                                            <p className="font-semibold text-amber-800 dark:text-amber-200">Belum waktunya pulang</p>
+                                            <p className="dark:text-amber-400/90">
                                                 Presensi pulang normal baru bisa dilakukan pukul{' '}
                                                 <strong>{work_schedule?.end_time}</strong>.
                                                 Sisa <strong>{minutesUntilEnd} menit</strong> lagi.
@@ -731,14 +731,14 @@ export default function AttendanceForm({
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                                        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">
                                             Alasan Pulang Awal (Wajib)
                                         </label>
                                         <textarea
                                             value={data.checkout_reason}
                                             onChange={(e) => setData('checkout_reason', e.target.value)}
                                             rows={2}
-                                            className="w-full rounded-xl border border-gray-300 bg-white p-3 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                            className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
                                             placeholder="Jelaskan alasan pulang lebih awal..."
                                         />
                                         {errors.checkout_reason && <p className="mt-1 text-xs text-red-500">{errors.checkout_reason}</p>}
@@ -783,17 +783,17 @@ export default function AttendanceForm({
                 <>
 
                     {/* Toggle Tabs - 3 tabs */}
-                    <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
+                    <div className="mb-6 flex rounded-xl bg-gray-100 dark:bg-slate-800 p-1 transition-colors">
                         <button type="button" onClick={() => { setActiveTab('wfo'); setData((p) => ({ ...p, status: 'wfo', latitude: '', longitude: '', face_verification_image: null, reason: '', proof_image: null })); setLocationStatus('pending'); setGeoError(null); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfo' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
                             WFO
                         </button>
                         <button type="button" onClick={() => { setActiveTab('wfhwfa'); setData((p) => ({ ...p, status: 'wfh', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfhwfa' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfhwfa' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
                             WFH / WFA
                         </button>
                         <button type="button" onClick={() => { setActiveTab('offsite'); setData((p) => ({ ...p, status: 'izin', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'offsite' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'offsite' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
                             Izin / Sakit
                         </button>
                     </div>
@@ -801,26 +801,26 @@ export default function AttendanceForm({
                     <form onSubmit={submitAttendance} className="space-y-5 pb-8">
                         {/* Status Selection */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                                 Status Kehadiran
                             </label>
                             <select
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value)}
                                 disabled={activeTab === 'wfo'}
-                                className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-500"
+                                className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 dark:disabled:bg-slate-900/50 disabled:text-gray-500 dark:disabled:text-slate-500"
                             >
-                                {activeTab === 'wfo' && <option value="wfo">Work From Office (WFO)</option>}
+                                {activeTab === 'wfo' && <option value="wfo" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Work From Office (WFO)</option>}
                                 {activeTab === 'wfhwfa' && (
                                     <>
-                                        <option value="wfh">Work From Home (WFH)</option>
-                                        <option value="wfa">Work From Anywhere (WFA)</option>
+                                        <option value="wfh" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Work From Home (WFH)</option>
+                                        <option value="wfa" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Work From Anywhere (WFA)</option>
                                     </>
                                 )}
                                 {activeTab === 'offsite' && (
                                     <>
-                                        <option value="izin">Izin</option>
-                                        <option value="sakit">Sakit</option>
+                                        <option value="izin" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Izin</option>
+                                        <option value="sakit" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Sakit</option>
                                     </>
                                 )}
                             </select>
@@ -836,25 +836,25 @@ export default function AttendanceForm({
                         {(activeTab === 'wfhwfa' || activeTab === 'offsite') && (
                             <>
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                                         Alasan (Wajib)
                                     </label>
                                     <textarea
                                         value={data.reason}
                                         onChange={(e) => setData('reason', e.target.value)}
                                         rows={3}
-                                        className="w-full rounded-xl border border-gray-300 bg-white p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         placeholder={`Jelaskan alasan ${activeTab === 'offsite' ? 'izin / sakit' : 'WFH / WFA'}...`}
                                     />
                                     {errors.reason && <p className="mt-1 text-xs text-red-500">{errors.reason}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
                                         {activeTab === 'offsite' ? 'Bukti Foto / Surat Dokter (Wajib)' : 'Foto Bukti (Opsional)'}
                                     </label>
-                                    <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-gray-500">
-                                        <UploadCloud className="mb-2 h-8 w-8" />
+                                    <div className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50 p-6 text-gray-500 dark:text-slate-400">
+                                        <UploadCloud className="mb-2 h-8 w-8 text-gray-400 dark:text-slate-500" />
                                         <span className="text-sm">Klik untuk upload foto</span>
                                         <input
                                             type="file"
@@ -863,7 +863,7 @@ export default function AttendanceForm({
                                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                                         />
                                     </div>
-                                    {data.proof_image && <p className="mt-2 text-xs text-green-600">File terpilih: {data.proof_image.name}</p>}
+                                    {data.proof_image && <p className="mt-2 text-xs text-green-600 dark:text-green-400">File terpilih: {data.proof_image.name}</p>}
                                     {errors.proof_image && <p className="mt-1 text-xs text-red-500">{errors.proof_image}</p>}
                                 </div>
                             </>

@@ -7,6 +7,7 @@ use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\Division;
 use App\Models\InternDraft;
+use App\Models\User;
 use App\Notifications\VerifyAccountNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,8 +21,8 @@ class InternController extends Controller
      */
     public function dashboard(Request $request)
     {
-        $user = $request->user()->load('profile.division');
-        $division = $user->profile?->division;
+        $user = $request->user()->load('division');
+        $division = $user->division;
 
         $recentAttendances = $user->attendances()->latest()->take(5)->get()
             ->map(fn (Attendance $att) => array_merge($att->toArray(), [
@@ -31,12 +32,12 @@ class InternController extends Controller
             ]));
 
         return Inertia::render('Intern/Dashboard', [
-            'totalDays' => $user->profile?->internship_duration_days ?? 90,
+            'totalDays' => $user->internship_duration_days ?? 90,
             'daysAttended' => $user->attendances()->whereIn('status', ['wfo', 'wfh', 'wfa'])->count(),
             'daysAbsent' => $user->attendances()->whereIn('status', ['izin', 'sakit'])->count(),
             'recentAttendances' => $recentAttendances,
             'announcements' => Announcement::whereNull('division_id')
-                ->orWhere('division_id', $user->profile?->division_id)
+                ->orWhere('division_id', $user->division_id)
                 ->latest()->take(5)->get(),
         ]);
     }
@@ -49,8 +50,7 @@ class InternController extends Controller
         $user = $request->user();
 
         if ($user->role === Role::Intern) {
-            $profile = $user->profile;
-            if (! $profile || empty($profile->nim) || ! $profile->nim_verified_at) {
+            if (empty($user->nim) || ! $user->nim_verified_at) {
                 $user->notify(new VerifyAccountNotification);
 
                 return back()->with('success', 'Email verifikasi berhasil dikirim ulang. Silakan cek Inbox atau folder Spam Anda.');
@@ -68,11 +68,11 @@ class InternController extends Controller
         // Izinkan post berikutnya tanpa tanda tangan ulang
         $request->session()->put('can_claim_nim', true);
 
-        $profile = $request->user()?->profile;
+        $user = $request->user();
 
         return Inertia::render('Intern/ClaimNim', [
-            'nim' => $profile?->nim,
-            'nimVerifiedAt' => $profile?->nim_verified_at,
+            'nim' => $user?->nim,
+            'nimVerifiedAt' => $user?->nim_verified_at,
             'status' => $request->session()->get('status'),
         ]);
     }
@@ -97,41 +97,69 @@ class InternController extends Controller
             return back()->withErrors(['nim' => 'NIM tidak ditemukan. Pastikan Admin sudah mendaftarkan NIM Anda.']);
         }
 
-        if ($draft->is_claimed && $draft->claimed_by_user_id !== $request->user()->id) {
-            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
-        }
+        $currentUser = $request->user();
 
-        if ($draft->claimed_by_user_id && $draft->claimed_by_user_id !== $request->user()->id) {
-            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
-        }
+        // Check if there is already a User record in database that has this NIM
+        $existingUser = User::where('nim', $nim)->first();
 
-        $user = $request->user();
+        if ($existingUser) {
+            // Check if it's already claimed by another active user
+            if ($existingUser->id !== $currentUser->id && $existingUser->nim_verified_at) {
+                return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
+            }
 
-        if ($draft->is_claimed && $draft->claimed_by_user_id === $user->id && $user->profile?->nim_verified_at) {
+            // Bind the logged-in credentials to the existing user record that already has the NIM
+            DB::transaction(function () use ($currentUser, $existingUser, $draft) {
+                if ($currentUser->id !== $existingUser->id) {
+                    $currentUser->delete();
+                }
+
+                $existingUser->update([
+                    'google_id' => $currentUser->google_id ?? $existingUser->google_id,
+                    'email' => $currentUser->email, // Take over the active email
+                    'nim_verified_at' => now(),
+                ]);
+
+                $draft->update([
+                    'is_claimed' => true,
+                    'claimed_by_user_id' => $existingUser->id,
+                ]);
+            });
+
+            // Log in as the merged user
+            auth()->login($existingUser, true);
+
             return redirect()->route('intern.setup-profile')
-                ->with('success', 'NIM sudah terverifikasi.');
+                ->with('success', 'NIM berhasil diverifikasi. Lanjutkan melengkapi profil Anda.');
         }
 
-        DB::transaction(function () use ($user, $draft) {
-            $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
+        // If no existing user has this NIM, we assign it directly to the current user
+        if ($draft->is_claimed && $draft->claimed_by_user_id !== $currentUser->id) {
+            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
+        }
 
-            $profile->fill([
+        if ($draft->claimed_by_user_id && $draft->claimed_by_user_id !== $currentUser->id) {
+            return back()->withErrors(['nim' => 'NIM ini sudah terdaftar/diklaim oleh akun lain.']);
+        }
+
+        DB::transaction(function () use ($currentUser, $draft) {
+            $currentUser->update([
                 'nim' => $draft->nim,
-                'nama_lengkap' => $draft->nama_lengkap,
+                'name' => $draft->name,
                 'division_id' => $draft->division_id,
                 'internship_duration_days' => $draft->internship_duration_days,
                 'nim_verified_at' => now(),
             ]);
 
             if ($draft->division_id) {
-                $profile->divisi = Division::query()->whereKey($draft->division_id)->value('name');
+                $currentUser->update([
+                    'divisi' => Division::query()->whereKey($draft->division_id)->value('name'),
+                ]);
             }
-
-            $profile->save();
 
             $draft->update([
                 'is_claimed' => true,
-                'claimed_by_user_id' => $user->id,
+                'claimed_by_user_id' => $currentUser->id,
             ]);
         });
 
@@ -144,11 +172,11 @@ class InternController extends Controller
      */
     public function setupProfile(Request $request)
     {
-        $user = $request->user()->load('profile.division');
+        $user = $request->user()->load('division');
 
         return Inertia::render('Intern/SetupProfile', [
-            'divisionName' => $user->profile?->division?->name ?? $user->profile?->divisi,
-            'existingProfile' => $user->profile,
+            'divisionName' => $user->division?->name ?? $user->divisi,
+            'existingProfile' => $user,
             'userName' => $user->name,
             'divisions' => Division::orderBy('name')->get(['id', 'name']),
         ]);
@@ -163,22 +191,21 @@ class InternController extends Controller
             'foto' => 'required|image|max:5120',
             'foto_left' => 'nullable|image|max:5120',
             'foto_right' => 'nullable|image|max:5120',
-            'nama_lengkap' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'asal_kampus' => 'nullable|string|max:255',
             'division_id' => 'nullable|exists:divisions,id',
             'internship_duration_days' => 'required|integer|min:1|max:365',
         ]);
 
         $user = $request->user();
-        $profile = $user->profile()->firstOrNew(['user_id' => $user->id]);
 
-        $divisionId = $request->division_id ?? $user->profile?->division_id;
+        $divisionId = $request->division_id ?? $user->division_id;
         $division = Division::find($divisionId);
-        $divisionName = $division?->name ?? $user->profile?->divisi;
+        $divisionName = $division?->name ?? $user->divisi;
 
-        $profile->fill([
+        $user->fill([
             'foto' => $request->file('foto')->store('profiles', 'public'),
-            'nama_lengkap' => $request->nama_lengkap,
+            'name' => $request->name,
             'asal_kampus' => $request->asal_kampus,
             'divisi' => $divisionName,
             'division_id' => $divisionId,
@@ -186,14 +213,14 @@ class InternController extends Controller
         ]);
 
         if ($request->hasFile('foto_left')) {
-            $profile->foto_left = $request->file('foto_left')->store('profiles', 'public');
+            $user->foto_left = $request->file('foto_left')->store('profiles', 'public');
         }
 
         if ($request->hasFile('foto_right')) {
-            $profile->foto_right = $request->file('foto_right')->store('profiles', 'public');
+            $user->foto_right = $request->file('foto_right')->store('profiles', 'public');
         }
 
-        $profile->save();
+        $user->save();
 
         return redirect()->route('intern.dashboard')->with('success', 'Profil berhasil dibuat!');
     }
@@ -204,7 +231,7 @@ class InternController extends Controller
     public function profile(Request $request)
     {
         return Inertia::render('Intern/Profile', [
-            'user' => $request->user()->load('profile.division'),
+            'user' => $request->user()->load('division'),
         ]);
     }
 
@@ -214,7 +241,7 @@ class InternController extends Controller
     public function editProfile(Request $request)
     {
         return Inertia::render('Intern/EditProfile', [
-            'user' => $request->user()->load('profile.division'),
+            'user' => $request->user()->load('division'),
             'divisions' => Division::orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -225,23 +252,22 @@ class InternController extends Controller
     public function updateProfile(Request $request)
     {
         $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'asal_kampus' => 'nullable|string|max:255',
             'division_id' => 'nullable|exists:divisions,id',
             'internship_duration_days' => 'required|integer|min:1|max:365',
         ]);
 
         $user = $request->user();
-        $profile = $user->profile;
 
-        $divisionId = $request->division_id ?? $profile->division_id;
+        $divisionId = $request->division_id ?? $user->division_id;
         $division = Division::find($divisionId);
 
-        $profile->update([
-            'nama_lengkap' => $request->nama_lengkap,
+        $user->update([
+            'name' => $request->name,
             'asal_kampus' => $request->asal_kampus,
             'division_id' => $divisionId,
-            'divisi' => $division?->name ?? $profile->divisi,
+            'divisi' => $division?->name ?? $user->divisi,
             'internship_duration_days' => $request->internship_duration_days,
         ]);
 
@@ -253,8 +279,8 @@ class InternController extends Controller
      */
     public function history(Request $request)
     {
-        $user = $request->user()->load('profile.division');
-        $division = $user->profile?->division;
+        $user = $request->user()->load('division');
+        $division = $user->division;
 
         $attendances = $user->attendances()->latest()->paginate(15);
 

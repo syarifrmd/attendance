@@ -18,7 +18,7 @@ class MentorController extends Controller
         $search = $request->get('search', '');
 
         $query = User::where('role', 'intern')
-            ->with(['profile.division', 'attendances' => function ($q) {
+            ->with(['division', 'attendances' => function ($q) {
                 $q->latest()->limit(1);
             }])
             ->withCount([
@@ -30,7 +30,7 @@ class MentorController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('profile', fn ($pq) => $pq->where('nama_lengkap', 'like', "%{$search}%"));
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -45,7 +45,7 @@ class MentorController extends Controller
 
         $interns->transform(function (User $intern) use ($todayAttendances) {
             $todayAtt = $todayAttendances->get($intern->id);
-            $division = $intern->profile?->division;
+            $division = $intern->division;
             $isLate = false;
 
             if ($todayAtt && $todayAtt->check_in_at && $division?->start_time) {

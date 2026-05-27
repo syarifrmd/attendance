@@ -41,7 +41,7 @@ interface Intern {
     total_absent: number;
     late_count: number;
     profile: {
-        nama_lengkap: string;
+        name: string;
         asal_kampus: string;
         foto: string | null;
         division: Division | null;
@@ -51,7 +51,7 @@ interface Intern {
 }
 
 interface InternDraft {
-    id: number; nim: string; nama_lengkap: string;
+    id: number; nim: string; name: string;
     division: Division | null; internship_duration_days: number;
     is_claimed: boolean; created_at: string;
 }
@@ -121,7 +121,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
 
     // Add draft modal
     const [addModal, setAddModal] = useState(false);
-    const [addForm, setAddForm] = useState({ nim: '', nama_lengkap: '', division_id: '', internship_duration_days: '90' });
+    const [addForm, setAddForm] = useState({ nim: '', name: '', division_id: '', internship_duration_days: '90' });
     const [addErrors, setAddErrors] = useState<Record<string, string>>({});
     const [addLoading, setAddLoading] = useState(false);
 
@@ -173,11 +173,11 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
         setAddErrors({});
         router.post('/mentor/intern-drafts', {
             nim: addForm.nim,
-            nama_lengkap: addForm.nama_lengkap,
+            name: addForm.name,
             division_id: addForm.division_id || undefined,
             internship_duration_days: parseInt(addForm.internship_duration_days) || 90,
         }, {
-            onSuccess: () => { setAddModal(false); setAddForm({ nim: '', nama_lengkap: '', division_id: '', internship_duration_days: '90' }); setAddLoading(false); },
+            onSuccess: () => { setAddModal(false); setAddForm({ nim: '', name: '', division_id: '', internship_duration_days: '90' }); setAddLoading(false); },
             onError: (errs) => { setAddErrors(errs); setAddLoading(false); },
         });
     };
@@ -316,7 +316,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                                 <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-400">Tidak ada data intern ditemukan.</td></tr>
                             ) : interns.data.map((intern) => {
                                 const att = intern.today_attendance;
-                                const displayName = intern.profile?.nama_lengkap || intern.name;
+                                const displayName = intern.name;
                                 const avatarSrc = intern.profile?.foto
                                     ? `/storage/${intern.profile.foto}`
                                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
@@ -540,12 +540,12 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                                     </label>
                                     <input
                                         type="text"
-                                        value={addForm.nama_lengkap}
-                                        onChange={(e) => setAddForm({ ...addForm, nama_lengkap: e.target.value })}
-                                        placeholder="Nama lengkap intern"
-                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none ${addErrors.nama_lengkap ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                                        value={addForm.name}
+                                        onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
+                                        placeholder="Cth: Budi Santoso"
+                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none ${addErrors.name ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
                                     />
-                                    {addErrors.nama_lengkap && <p className="mt-1 text-xs text-rose-500">{addErrors.nama_lengkap}</p>}
+                                    {addErrors.name && <p className="mt-1 text-xs text-rose-500">{addErrors.name}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-semibold text-slate-700">Durasi Magang (Hari)</label>
@@ -566,7 +566,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                             </button>
                             <button
                                 onClick={submitAddDraft}
-                                disabled={addLoading || !addForm.nim || !addForm.nama_lengkap}
+                                disabled={addLoading || !addForm.nim || !addForm.name}
                                 className="flex-1 rounded-xl bg-slate-900 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {addLoading ? 'Menyimpan...' : 'Simpan Data'}
@@ -607,7 +607,7 @@ export default function AdminInternsIndex({ interns, divisions, filters, selecte
                                         {drafts.map((d) => (
                                             <tr key={d.id} className="border-t border-slate-100 hover:bg-slate-50/60">
                                                 <td className="px-5 py-3 font-mono text-xs font-medium text-slate-700">{d.nim}</td>
-                                                <td className="px-5 py-3 font-medium text-slate-800">{d.nama_lengkap}</td>
+                                                <td className="px-5 py-3 font-medium text-slate-800">{d.name}</td>
                                                 <td className="px-5 py-3 text-slate-500">{d.division?.name || '-'}</td>
                                                 <td className="px-5 py-3 text-slate-500">{d.internship_duration_days} hari</td>
                                                 <td className="px-5 py-3 text-center">

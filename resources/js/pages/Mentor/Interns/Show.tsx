@@ -24,7 +24,7 @@ interface PaginatedAttendances {
 
 interface Intern {
     id: string; name: string; email: string;
-    profile: { nama_lengkap: string; asal_kampus: string | null; foto: string | null; division: Division | null; divisi: string | null; periode_magang: string | null; internship_duration_days: number | null; division_id: string | null; } | null;
+    profile: { asal_kampus: string | null; foto: string | null; division: Division | null; divisi: string | null; internship_duration_days: number | null; division_id: string | null; } | null;
 }
 
 interface Props {
@@ -59,10 +59,9 @@ export default function MentorInternShow({ intern, attendances, division, filter
     // Edit user modal
     const [editModal, setEditModal] = useState(false);
     const [editForm, setEditForm] = useState({
-        nama_lengkap: intern.profile?.nama_lengkap ?? '',
+        name: intern.name,
         asal_kampus: intern.profile?.asal_kampus ?? '',
         division_id: intern.profile?.division?.id ?? intern.profile?.division_id ?? '',
-        periode_magang: intern.profile?.periode_magang ?? '',
         internship_duration_days: String(intern.profile?.internship_duration_days ?? 90),
         email: intern.email,
     });
@@ -72,7 +71,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
     // Confirm delete user
     const [confirmDelete, setConfirmDelete] = useState(false);
 
-    const internName = intern.profile?.nama_lengkap || intern.name;
+    const internName = intern.name;
     const displayName = internName;
     const avatarSrc = intern.profile?.foto ? `/storage/${intern.profile.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
     const targetDays = intern.profile?.internship_duration_days ?? 90;
@@ -86,10 +85,9 @@ export default function MentorInternShow({ intern, attendances, division, filter
         setEditLoading(true);
         setEditErrors({});
         router.patch(`/mentor/interns/${intern.id}`, {
-            nama_lengkap: editForm.nama_lengkap,
+            name: editForm.name,
             asal_kampus: editForm.asal_kampus || undefined,
             division_id: editForm.division_id || undefined,
-            periode_magang: editForm.periode_magang || undefined,
             internship_duration_days: parseInt(editForm.internship_duration_days) || undefined,
             email: editForm.email,
         }, {
@@ -148,8 +146,8 @@ export default function MentorInternShow({ intern, attendances, division, filter
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-500 dark:bg-slate-700/50 dark:text-slate-400"><Calendar size={20} /></div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-xs font-medium text-slate-400">Periode Magang</p>
-                                    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">{intern.profile?.periode_magang || '-'}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Durasi Magang</p>
+                                    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">{intern.profile?.internship_duration_days || '-'} Hari</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -291,9 +289,9 @@ export default function MentorInternShow({ intern, attendances, division, filter
                         <form onSubmit={handleEditSubmit} className="p-6 max-h-[80vh] overflow-y-auto">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Nama Lengkap *</label>
-                                    <input type="text" value={editForm.nama_lengkap} onChange={e => setEditForm({...editForm, nama_lengkap: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
-                                    {editErrors.nama_lengkap && <p className="mt-1 text-xs text-rose-500">{editErrors.nama_lengkap}</p>}
+                                    <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">Nama Lengkap <span className="text-rose-500">*</span></label>
+                                    <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
+                                    {editErrors.name && <p className="mt-1 text-xs text-rose-500">{editErrors.name}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email Utama *</label>
@@ -313,11 +311,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                                     {editErrors.division_id && <p className="mt-1 text-xs text-rose-500">{editErrors.division_id}</p>}
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Periode Magang</label>
-                                        <input type="text" value={editForm.periode_magang} onChange={e => setEditForm({...editForm, periode_magang: e.target.value})} placeholder="Jan - Mar 2024" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
-                                    </div>
-                                    <div>
+                                    <div className="col-span-2">
                                         <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Durasi (Hari) *</label>
                                         <input type="number" min="1" max="730" value={editForm.internship_duration_days} onChange={e => setEditForm({...editForm, internship_duration_days: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
                                     </div>

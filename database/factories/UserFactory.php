@@ -34,6 +34,14 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
             'role' => 'intern',
+            'nim' => fake()->unique()->numerify('##########'),
+            'nim_verified_at' => now(),
+            'foto' => 'profiles/front.jpg',
+            'foto_left' => 'profiles/left.jpg',
+            'foto_right' => 'profiles/right.jpg',
+            'asal_kampus' => fake()->company(),
+            'divisi' => 'IT Support',
+            'internship_duration_days' => 90,
         ];
     }
 
@@ -44,6 +52,32 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model's NIM is unverified/unclaimed.
+     */
+    public function unverifiedNim(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'nim' => null,
+            'nim_verified_at' => null,
+            'foto' => null,
+            'foto_left' => null,
+            'foto_right' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the model has no profile photos setup.
+     */
+    public function noPhotos(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'foto' => null,
+            'foto_left' => null,
+            'foto_right' => null,
         ]);
     }
 
