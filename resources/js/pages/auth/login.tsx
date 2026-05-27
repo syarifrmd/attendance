@@ -30,25 +30,25 @@ export default function Login({
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
             <Head title="Welcome Back" />
             
             {/* Background Decorations */}
-            <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#e0f7fa] rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-            <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#effcc8] rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+            <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#e0f7fa] dark:bg-slate-800 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+            <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#effcc8] dark:bg-indigo-900/30 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
             
-            <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-sm p-8 pb-10 border border-slate-100 relative z-10">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm p-8 pb-10 border border-slate-100 dark:border-slate-800 relative z-10">
                 <div className="text-center mb-8">
-                    <h1 className="text-[26px] font-bold text-slate-900 mb-1">
+                    <h1 className="text-[26px] font-bold text-slate-900 dark:text-white mb-1">
                         Welcome Back
                     </h1>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                         Login to access your account
                     </p>
                 </div>
 
-                <div className="flex bg-[#F8F9FA] rounded-full p-1.5 mb-8 border border-slate-100">
-                    <Link href={register()} className="flex-1 bg-transparent py-2.5 text-center text-sm font-semibold text-slate-400 rounded-full hover:text-slate-600 transition">
+                <div className="flex bg-[#F8F9FA] dark:bg-slate-800 rounded-full p-1.5 mb-8 border border-slate-100 dark:border-slate-700">
+                    <Link href={register()} className="flex-1 bg-transparent py-2.5 text-center text-sm font-semibold text-slate-400 dark:text-slate-500 rounded-full hover:text-slate-600 dark:hover:text-slate-300 transition">
                         Sign Up
                     </Link>
                     <button className="flex-1 bg-[#C7F25E] py-2.5 text-sm font-bold text-slate-900 rounded-full shadow-sm">
@@ -58,7 +58,7 @@ export default function Login({
 
                 <form onSubmit={submit} className="flex flex-col gap-5">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2 px-1">Email</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 px-1">Email</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -66,14 +66,14 @@ export default function Login({
                                     onChange={(e) => setData('email', e.target.value)}
                                     required
                                     autoFocus
-                                    className="w-full rounded-full border border-slate-200 py-3.5 px-5 focus:border-[#7D76F0] focus:ring-[#7D76F0] outline-none shadow-sm placeholder:text-slate-400 text-[15px]"
+                                    className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 py-3.5 px-5 focus:border-[#7D76F0] focus:ring-[#7D76F0] outline-none shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white text-[15px]"
                                     placeholder="Enter your email"
                                 />
                                 <InputError message={errors.email} className="mt-1 ml-2" />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2 px-1">Password</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 px-1">Password</label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? 'text' : 'password'}
@@ -81,13 +81,13 @@ export default function Login({
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         required
-                                        className="w-full rounded-full border border-slate-200 py-3.5 pl-5 pr-12 focus:border-[#7D76F0] focus:ring-[#7D76F0] outline-none shadow-sm placeholder:text-slate-400 text-[15px] font-mono tracking-widest"
+                                        className="w-full rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 py-3.5 pl-5 pr-12 focus:border-[#7D76F0] focus:ring-[#7D76F0] outline-none shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white text-[15px] font-mono tracking-widest"
                                         placeholder="••••••••"
                                     />
                                     <button 
                                         type="button" 
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                                     >
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
@@ -102,9 +102,9 @@ export default function Login({
                                         name="remember"
                                         checked={data.remember}
                                         onChange={(e) => setData('remember', e.target.checked)}
-                                        className="rounded border-slate-300 text-[#7D76F0] focus:ring-[#7D76F0] h-4 w-4"
+                                        className="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-950 text-[#7D76F0] focus:ring-[#7D76F0] h-4 w-4"
                                     />
-                                    <span className="text-sm text-slate-600 font-medium">Remember me</span>
+                                    <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">Remember me</span>
                                 </label>
                             </div>
 
@@ -119,16 +119,16 @@ export default function Login({
                             
                             <div className="relative my-6 flex items-center justify-center">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-slate-100"></div>
+                                    <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
                                 </div>
-                                <div className="relative bg-white px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                                <div className="relative bg-white dark:bg-slate-900 px-4 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                                     Or Sign In With
                                 </div>
                             </div>
 
                                 <a 
                                     href={googleAuth.url()} 
-                                    className="col-span-2 flex items-center justify-center gap-2 rounded-full border border-slate-100 bg-white py-3 shadow-sm hover:bg-slate-50 transition active:scale-95"
+                                    className="col-span-2 flex items-center justify-center gap-2 rounded-full border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 py-3 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition active:scale-95"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -137,11 +137,11 @@ export default function Login({
                                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                                         <path d="M1 1h22v22H1z" fill="none"/>
                                     </svg>
-                                    <span className="text-sm font-semibold text-slate-700">Google</span>
+                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Google</span>
                                 </a>
 
                             {canRegister && (
-                                <p className="text-center text-sm font-medium text-slate-500 mt-6">
+                                <p className="text-center text-sm font-medium text-slate-500 dark:text-slate-400 mt-6">
                                     Don't have an account?{' '}
                                     <Link href={register()} className="text-[#7D76F0] font-bold hover:underline">
                                         Sign Up

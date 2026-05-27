@@ -77,7 +77,6 @@ const fmtTime = (s: string | null) => s ? new Date(s).toLocaleTimeString('id-ID'
 
 export default function MentorInternsIndex({ interns, divisions, filters, selected_date, drafts = [] }: Props) {
     const { props } = usePage<{ auth: { user: { role: string } } }>();
-    const isAdmin = props.auth?.user?.role === 'admin';
 
     const [search, setSearch] = useState(filters.search ?? '');
     const [divisionId, setDivisionId] = useState(filters.division_id ?? '');

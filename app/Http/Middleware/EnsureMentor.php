@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Restrict access to users with manager-level roles (mentor or admin).
+ * Restrict access to users with manager-level roles (mentor).
  */
 class EnsureMentor
 {

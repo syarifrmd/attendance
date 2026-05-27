@@ -6,7 +6,7 @@ use App\Models\InternDraft;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->admin = User::factory()->create(['role' => Role::Admin]);
+    $this->manager = User::factory()->create(['role' => Role::Mentor]);
     $this->intern = User::factory()->create(['role' => Role::Intern]);
     $this->division = Division::create([
         'name' => 'Test Division',
@@ -21,7 +21,7 @@ beforeEach(function () {
 // --- Intern Draft (Pre-registration) ---
 
 it('admin can create an intern draft', function () {
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->post('/mentor/intern-drafts', [
             'nim' => 'NIM123456',
             'name' => 'Intern Baru',
@@ -36,7 +36,7 @@ it('admin can create an intern draft', function () {
 it('cannot create intern draft with duplicate NIM', function () {
     InternDraft::create(['nim' => 'DUPNIM', 'name' => 'First', 'internship_duration_days' => 90]);
 
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->post('/mentor/intern-drafts', [
             'nim' => 'DUPNIM',
             'name' => 'Another Intern',
@@ -48,7 +48,7 @@ it('cannot create intern draft with duplicate NIM', function () {
 it('admin can delete an intern draft', function () {
     $draft = InternDraft::create(['nim' => 'DEL123', 'name' => 'To Delete', 'internship_duration_days' => 90]);
 
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->delete("/mentor/intern-drafts/{$draft->id}");
 
     $response->assertRedirect();
@@ -64,7 +64,7 @@ it('intern cannot access intern draft routes', function () {
 // --- Intern Show (Fix 404) ---
 
 it('admin can view intern detail page', function () {
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->get("/mentor/interns/{$this->intern->id}");
 
     $response->assertOk()
@@ -74,7 +74,7 @@ it('admin can view intern detail page', function () {
 it('returns 404 when trying to view a mentor as an intern detail', function () {
     $mentor = User::factory()->create(['role' => Role::Mentor]);
 
-    $this->actingAs($this->admin)
+    $this->actingAs($this->manager)
         ->get("/mentor/interns/{$mentor->id}")
         ->assertNotFound();
 });
@@ -82,7 +82,7 @@ it('returns 404 when trying to view a mentor as an intern detail', function () {
 // --- Intern Update (Edit User) ---
 
 it('admin can update intern profile data', function () {
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->patch("/mentor/interns/{$this->intern->id}", [
             'name' => 'Updated Name',
             'division_id' => $this->division->id,
@@ -95,7 +95,7 @@ it('admin can update intern profile data', function () {
 it('cannot update a mentor user via intern endpoint', function () {
     $mentor = User::factory()->create(['role' => Role::Mentor]);
 
-    $this->actingAs($this->admin)
+    $this->actingAs($this->manager)
         ->patch("/mentor/interns/{$mentor->id}", ['name' => 'Hacked'])
         ->assertNotFound();
 });
@@ -105,7 +105,7 @@ it('cannot update a mentor user via intern endpoint', function () {
 it('admin can delete an intern user', function () {
     $internId = $this->intern->id;
 
-    $response = $this->actingAs($this->admin)
+    $response = $this->actingAs($this->manager)
         ->delete("/mentor/interns/{$this->intern->id}");
 
     $response->assertRedirect(route('mentor.interns.index'));

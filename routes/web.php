@@ -1,11 +1,11 @@
 <?php
 
 use App\Enums\Role;
-use App\Http\Controllers\Admin\DivisionController;
-use App\Http\Controllers\Admin\InternController as ManagerInternController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\InternController;
+use App\Http\Controllers\Mentor\DivisionController;
+use App\Http\Controllers\Mentor\InternController as ManagerInternController;
 use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         $role = auth()->user()->role;
 
-        if ($role === Role::Mentor || $role === Role::Admin) {
+        if ($role === Role::Mentor) {
             return redirect()->route('mentor.interns.index');
         }
 
@@ -80,16 +80,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('announcements', AnnouncementController::class)->only(['index', 'store', 'destroy']);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | LEGACY /admin REDIRECTS
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('admin')->middleware('mentor')->group(function () {
-        Route::get('interns', fn () => redirect()->route('mentor.interns.index'));
-        Route::get('interns/{user}', fn ($user) => redirect()->route('mentor.interns.show', $user));
-        Route::get('divisions', fn () => redirect()->route('mentor.divisions.index'));
-    });
 });
 
 require __DIR__.'/settings.php';
