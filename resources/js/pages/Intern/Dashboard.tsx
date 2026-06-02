@@ -1,4 +1,4 @@
-﻿import { Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import AttendanceSummaryCard from '@/components/PWA/AttendanceSummaryCard';
 import { Clock, Bell, ChevronRight } from 'lucide-react';
@@ -17,6 +17,25 @@ interface Announcement {
     content: string;
     created_at: string;
 }
+
+const showNativeNotification = async (title: string, options: any) => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+    
+    try {
+        new Notification(title, options);
+    } catch (e) {
+        // Fallback for Android Chrome PWA which throws Illegal Constructor
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                registration.showNotification(title, options);
+            } catch (swError) {
+                console.error('Failed to show SW notification', swError);
+            }
+        }
+    }
+};
 
 interface DashboardProps {
     auth: {
@@ -43,7 +62,7 @@ export default function Dashboard({
             if (Notification.permission === 'default') {
                 Notification.requestPermission().then((permission) => {
                     if (permission === 'granted') {
-                        new Notification('Attendance App', {
+                        showNativeNotification('Attendance App', {
                             body: 'Izin notifikasi aktif! Anda akan menerima pengumuman terbaru di sini.',
                         });
                     }
@@ -51,7 +70,7 @@ export default function Dashboard({
             } else if (Notification.permission === 'granted') {
                 const lastNotified = sessionStorage.getItem('pwa_welcome_notified');
                 if (!lastNotified) {
-                    new Notification('Attendance App', {
+                    showNativeNotification('Attendance App', {
                         body: `Halo, ${auth.user.name}! Selamat bekerja dan beraktivitas hari ini.`,
                     });
                     sessionStorage.setItem('pwa_welcome_notified', 'true');
@@ -78,11 +97,9 @@ export default function Dashboard({
     useEffect(() => {
         const currentUnread = auth.unread_notifications_count || 0;
         if (currentUnread > prevUnreadRef.current) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Pengumuman Baru!', {
-                    body: 'Ada pengumuman penting baru untuk Anda. Silakan klik ikon lonceng untuk membaca.',
-                });
-            }
+            showNativeNotification('Pengumuman Baru!', {
+                body: 'Ada pengumuman penting baru untuk Anda. Silakan klik ikon lonceng untuk membaca.',
+            });
         }
         prevUnreadRef.current = currentUnread;
     }, [auth.unread_notifications_count]);
