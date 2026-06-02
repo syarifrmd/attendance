@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import { User, Briefcase, GraduationCap, Mail, Edit3, LogOut } from 'lucide-react';
 
@@ -39,14 +39,14 @@ export default function Profile({ user }: { user: UserData }) {
                         alt="Profile"
                         className="h-full w-full rounded-full border-4 border-white dark:border-slate-800 object-cover shadow-md"
                     />
-                    <Link href="/intern/profile/edit" className="absolute bottom-0 right-0 rounded-full border-2 border-white bg-indigo-600 p-1.5 text-white shadow-sm transition-transform hover:bg-indigo-700 active:scale-95">
+                    <Link href="/intern/profile/edit" className="absolute bottom-0 right-0 rounded-full border-2 border-white bg-gradient-to-br from-[#fcb6c0] to-[#b490f0] p-1.5 text-white shadow-sm transition-transform hover:opacity-90 active:scale-95">
                         <Edit3 size={14} />
                     </Link>
                 </div>
                 <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100">
                     {user.name}
                 </h2>
-                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                <p className="text-sm font-medium text-[#a488ea] dark:text-[#b49ef5]">
                     {profile?.division?.name || profile?.divisi || 'Intern'}
                 </p>
             </div>
@@ -59,7 +59,7 @@ export default function Profile({ user }: { user: UserData }) {
                     
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 text-[#a488ea] dark:text-[#b49ef5]">
                                 <User size={18} />
                             </div>
                             <div>
@@ -71,7 +71,7 @@ export default function Profile({ user }: { user: UserData }) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 text-[#a488ea] dark:text-[#b49ef5]">
                                 <Mail size={18} />
                             </div>
                             <div>
@@ -83,7 +83,7 @@ export default function Profile({ user }: { user: UserData }) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 text-[#a488ea] dark:text-[#b49ef5]">
                                 <GraduationCap size={18} />
                             </div>
                             <div>
@@ -95,7 +95,7 @@ export default function Profile({ user }: { user: UserData }) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 text-[#a488ea] dark:text-[#b49ef5]">
                                 <Briefcase size={18} />
                             </div>
                             <div>
@@ -107,7 +107,7 @@ export default function Profile({ user }: { user: UserData }) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 text-[#a488ea] dark:text-[#b49ef5]">
                                 <div className="font-bold text-xs">90</div>
                             </div>
                             <div>
@@ -133,3 +133,4 @@ export default function Profile({ user }: { user: UserData }) {
         </MobileLayout>
     );
 }
+

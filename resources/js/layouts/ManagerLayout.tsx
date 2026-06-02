@@ -47,43 +47,46 @@ export default function ManagerLayout({ title, children }: ManagerLayoutProps) {
             <Head title={title} />
 
             {/* Desktop Sidebar */}
-            <aside className="hidden w-64 flex-shrink-0 flex-col bg-gradient-to-b from-indigo-900 to-indigo-950 text-white shadow-xl md:flex dark:from-indigo-950 dark:to-slate-950">
-                <div className="border-b border-indigo-800/60 p-6 dark:border-indigo-900/40">
+            <aside className="hidden w-64 flex-shrink-0 flex-col text-white shadow-2xl md:flex dark:from-slate-900 dark:to-slate-950"
+                style={{ background: 'linear-gradient(160deg, #5c42b5 0%, #3a257c 100%)' }}
+            >
+                {/* Brand Header */}
+                <div className="border-b border-white/25 p-6">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/30 backdrop-blur">
-                            <LayoutDashboard size={20} className="text-indigo-200" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25 shadow-inner backdrop-blur-sm ring-1 ring-white/30">
+                            <LayoutDashboard size={20} className="text-white drop-shadow-sm" />
                         </div>
                         <div>
-                            <p className="text-xs font-medium text-indigo-400">Panel</p>
-                            <p className="text-base font-bold text-white tracking-tight">Manajemen</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">Panel</p>
+                            <p className="text-base font-extrabold tracking-tight text-white drop-shadow-sm">Manajemen</p>
                         </div>
                     </div>
                 </div>
 
-                <nav className="flex-1 space-y-1 px-3 py-5">
+                <nav className="flex-1 space-y-0.5 px-3 py-5">
                     {navItems.map((item) => (
                         <Link
                             key={item.name}
                             href={item.href}
-                            className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                            className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
                                 item.active
-                                    ? 'bg-white/10 text-white shadow-sm'
-                                    : 'text-indigo-300 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-gradient-to-r from-[#fcb6c0] to-[#b490f0] text-white shadow-md'
+                                    : 'text-white/65 hover:bg-white/10 hover:text-white'
                             }`}
                         >
-                            <item.icon size={18} className={item.active ? 'text-indigo-200' : 'text-indigo-400 group-hover:text-indigo-200'} />
+                            <item.icon size={18} className={item.active ? 'text-white drop-shadow-sm' : 'text-white/50 group-hover:text-white/80'} />
                             {item.name}
-                            {item.active && <ChevronRight size={14} className="ml-auto text-indigo-400" />}
+                            {item.active && <ChevronRight size={14} className="ml-auto text-white/70" />}
                         </Link>
                     ))}
                 </nav>
 
-                <div className="border-t border-indigo-800/60 p-3 dark:border-indigo-900/40">
+                <div className="border-t border-white/20 p-3">
                     <Link
                         href="/logout"
                         method="post"
                         as="button"
-                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-500/10 hover:text-rose-200"
+                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-white/70 transition-colors hover:bg-white/15 hover:text-white"
                     >
                         <LogOut size={18} />
                         Keluar
@@ -96,7 +99,7 @@ export default function ManagerLayout({ title, children }: ManagerLayoutProps) {
                 {/* Desktop Header */}
                 <header className="sticky top-0 z-10 hidden items-center justify-between border-b border-slate-200/80 bg-white/80 px-8 py-4 backdrop-blur-md md:flex dark:border-slate-800/80 dark:bg-slate-900/80">
                     <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{title}</h1>
-                    <div className="flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:ring-indigo-500/20">
+                    <div className="flex items-center gap-2 rounded-full bg-[#f3effd] px-4 py-1.5 text-xs font-medium text-[#a488ea] ring-1 ring-[#d4cafc] dark:bg-[#a488ea]/10 dark:text-[#b49ef5] dark:ring-[#a488ea]/20">
                         <LayoutDashboard size={13} />
                         Panel Manajemen
                     </div>
@@ -105,7 +108,7 @@ export default function ManagerLayout({ title, children }: ManagerLayoutProps) {
                 {/* Mobile Header */}
                 <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm md:hidden dark:border-slate-800 dark:bg-slate-900">
                     <div className="flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#fcb6c0] to-[#b490f0]">
                             <LayoutDashboard size={14} className="text-white" />
                         </div>
                         <h1 className="text-base font-bold text-slate-900 dark:text-slate-100">{title}</h1>
@@ -129,7 +132,7 @@ export default function ManagerLayout({ title, children }: ManagerLayoutProps) {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                                         item.active
-                                            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400'
+                                            ? 'bg-[#f3effd] text-[#a488ea] dark:bg-[#a488ea]/10 dark:text-[#b49ef5]'
                                             : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                     }`}
                                 >
@@ -158,3 +161,4 @@ export default function ManagerLayout({ title, children }: ManagerLayoutProps) {
         </div>
     );
 }
+

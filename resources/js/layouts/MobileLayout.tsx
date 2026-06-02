@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import BottomNav from '@/components/PWA/BottomNav';
 
@@ -24,4 +24,5 @@ export default function MobileLayout({
         </div>
     );
 }
+
 

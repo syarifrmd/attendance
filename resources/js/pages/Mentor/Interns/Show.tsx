@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+﻿import { Head, Link, router } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import { useState } from 'react';
 import {
@@ -120,7 +120,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                 </div>
                 <button
                     onClick={() => setEditModal(true)}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#f3effd] px-4 py-2.5 text-sm font-semibold text-[#7c64d5] hover:bg-[#e8e0fc] transition-colors dark:bg-[#f3effd]0/10 dark:text-[#b49ef5] dark:hover:bg-[#f3effd]0/20"
                 >
                     <UserCog size={16} /> Edit Data Intern
                 </button>
@@ -132,7 +132,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                         <div className="flex flex-col items-center text-center">
                             <img src={avatarSrc} alt={internName} className="mb-4 h-24 w-24 rounded-full object-cover ring-4 ring-slate-50 dark:ring-slate-700" />
                             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{internName}</h3>
-                            <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{intern.profile?.division?.name || intern.profile?.divisi || 'Belum ada divisi'}</p>
+                            <p className="text-sm font-medium text-[#a488ea] dark:text-[#b49ef5]">{intern.profile?.division?.name || intern.profile?.divisi || 'Belum ada divisi'}</p>
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{intern.email}</p>
                         </div>
                         <div className="mt-6 space-y-4 border-t border-slate-100 pt-6 dark:border-slate-700/50">
@@ -177,16 +177,16 @@ export default function MentorInternShow({ intern, attendances, division, filter
                             </div>
                             <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-700/50 dark:bg-slate-700/30">
                                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Sisa Target</p>
-                                <p className="mt-1 text-xl font-bold text-indigo-600 dark:text-indigo-400">{Math.max(0, targetDays - stats.total_checkin)}x</p>
+                                <p className="mt-1 text-xl font-bold text-[#a488ea] dark:text-[#b49ef5]">{Math.max(0, targetDays - stats.total_checkin)}x</p>
                             </div>
                         </div>
                         <div className="mt-5">
                             <div className="mb-2 flex justify-between text-xs font-medium">
                                 <span className="text-slate-500 dark:text-slate-400">Progres Magang</span>
-                                <span className="text-indigo-600 dark:text-indigo-400">{progressPercent}%</span>
+                                <span className="text-[#a488ea] dark:text-[#b49ef5]">{progressPercent}%</span>
                             </div>
                             <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
-                                <div className="h-full rounded-full bg-indigo-500 transition-all duration-500 dark:bg-indigo-400" style={{ width: `${progressPercent}%` }} />
+                                <div className="h-full rounded-full bg-[#f3effd]0 transition-all duration-500 dark:bg-indigo-400" style={{ width: `${progressPercent}%` }} />
                             </div>
                         </div>
                     </div>
@@ -195,9 +195,9 @@ export default function MentorInternShow({ intern, attendances, division, filter
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-slate-700/60 dark:bg-slate-800">
                         <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-                            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-indigo-300 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
+                            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-[#c4b5fa] focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
                             <span className="text-center text-xs text-slate-400 sm:text-left">sampai</span>
-                            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-indigo-300 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
+                            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-[#c4b5fa] focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
                             <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200">
                                 <option value="">Semua Status</option>
                                 <option value="wfo">WFO</option>
@@ -208,7 +208,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                             </select>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button onClick={applyFilters} className="flex-1 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors sm:flex-none dark:bg-indigo-500 dark:hover:bg-indigo-600">Filter</button>
+                            <button onClick={applyFilters} className="flex-1 rounded-xl bg-[#a488ea] px-4 py-2 text-sm font-semibold text-white hover:bg-[#8b6fe0] transition-colors sm:flex-none dark:bg-[#a488ea] dark:hover:bg-[#a488ea]">Filter</button>
                             {(fromDate || toDate || status) && (
                                 <button onClick={resetFilters} className="rounded-xl border border-slate-200 bg-white p-2 text-slate-500 hover:bg-slate-50 sm:flex-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"><X size={20} /></button>
                             )}
@@ -246,7 +246,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                                             </div>
                                         </div>
                                         {att.proof_image_url && (
-                                            <a href={att.proof_image_url} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20">
+                                            <a href={att.proof_image_url} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#d4cafc] bg-[#f3effd] px-3 py-2 text-xs font-semibold text-[#7c64d5] hover:bg-[#e8e0fc] dark:border-[#a488ea]/30 dark:bg-[#f3effd]0/10 dark:text-[#b49ef5] dark:hover:bg-[#f3effd]0/20">
                                                 <Image size={14} /> Lihat Bukti
                                             </a>
                                         )}
@@ -261,7 +261,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                             <p className="text-sm text-slate-400">Hal {attendances.current_page} dari {attendances.last_page}</p>
                             <div className="flex gap-1">
                                 {attendances.links.map((link, i) => link.url
-                                    ? <Link key={i} href={link.url} className={`rounded-lg px-3 py-1.5 text-sm transition ${link.active ? 'bg-indigo-600 font-semibold text-white dark:bg-indigo-500' : 'border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    ? <Link key={i} href={link.url} className={`rounded-lg px-3 py-1.5 text-sm transition ${link.active ? 'bg-[#a488ea] font-semibold text-white dark:bg-[#f3effd]0' : 'border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'}`} dangerouslySetInnerHTML={{ __html: link.label }} />
                                     : <span key={i} className="rounded-lg px-3 py-1.5 text-sm text-slate-300 dark:text-slate-600" dangerouslySetInnerHTML={{ __html: link.label }} />
                                 )}
                             </div>
@@ -290,21 +290,21 @@ export default function MentorInternShow({ intern, attendances, division, filter
                             <div className="space-y-4">
                                 <div>
                                     <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">Nama Lengkap <span className="text-rose-500">*</span></label>
-                                    <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
+                                    <input type="text" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-[#a488ea] focus:ring-1 focus:ring-[#a488ea] outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
                                     {editErrors.name && <p className="mt-1 text-xs text-rose-500">{editErrors.name}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email Utama *</label>
-                                    <input type="email" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
+                                    <input type="email" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-[#a488ea] focus:ring-1 focus:ring-[#a488ea] outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
                                     {editErrors.email && <p className="mt-1 text-xs text-rose-500">{editErrors.email}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Asal Kampus</label>
-                                    <input type="text" value={editForm.asal_kampus} onChange={e => setEditForm({...editForm, asal_kampus: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
+                                    <input type="text" value={editForm.asal_kampus} onChange={e => setEditForm({...editForm, asal_kampus: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-[#a488ea] outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Divisi</label>
-                                    <select value={editForm.division_id} onChange={e => setEditForm({...editForm, division_id: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+                                    <select value={editForm.division_id} onChange={e => setEditForm({...editForm, division_id: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-[#a488ea] outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
                                         <option value="">Pilih Divisi</option>
                                         {divisions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                                     </select>
@@ -313,7 +313,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2">
                                         <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Durasi (Hari) *</label>
-                                        <input type="number" min="1" max="730" value={editForm.internship_duration_days} onChange={e => setEditForm({...editForm, internship_duration_days: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-indigo-500 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
+                                        <input type="number" min="1" max="730" value={editForm.internship_duration_days} onChange={e => setEditForm({...editForm, internship_duration_days: e.target.value})} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-[#a488ea] outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" required />
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@ export default function MentorInternShow({ intern, attendances, division, filter
                                 <button type="button" onClick={handleDeleteIntern} className="rounded-xl px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10">Hapus Intern</button>
                                 <div className="flex gap-2">
                                     <button type="button" onClick={() => setEditModal(false)} className="rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Batal</button>
-                                    <button type="submit" disabled={editLoading} className="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-70 dark:bg-indigo-500 dark:hover:bg-indigo-600">{editLoading ? 'Menyimpan...' : 'Simpan Perubahan'}</button>
+                                    <button type="submit" disabled={editLoading} className="rounded-xl bg-[#a488ea] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#8b6fe0] disabled:opacity-70 dark:bg-[#a488ea] dark:hover:bg-[#a488ea]">{editLoading ? 'Menyimpan...' : 'Simpan Perubahan'}</button>
                                 </div>
                             </div>
                         </form>
@@ -354,3 +354,4 @@ export default function MentorInternShow({ intern, attendances, division, filter
         </ManagerLayout>
     );
 }
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Mail, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
 
@@ -16,86 +16,86 @@ export default function VerifyNotice() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-6">
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#fdfbfb] via-[#fad0c4] to-[#cba3f3] p-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
             <Head title="Cek Email Anda" />
 
-            {/* Card Container */}
-            <div className="w-full max-w-sm">
+            {/* Decorative blob */}
+            <div className="pointer-events-none absolute -top-24 -left-20 h-72 w-72 rounded-full bg-[#fcb6c0] opacity-20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-20 h-72 w-72 rounded-full bg-[#b490f0] opacity-20 blur-3xl" />
 
+            <div className="relative z-10 w-full max-w-sm">
                 {/* Icon + Header */}
-                <div className="flex flex-col items-center mb-8">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-blue-400 rounded-full blur-xl opacity-20 scale-150"></div>
-                        <div className="relative bg-white rounded-full p-5 shadow-lg border border-blue-100">
-                            <Mail className="h-10 w-10 text-blue-600" />
+                <div className="mb-8 flex flex-col items-center">
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 scale-150 rounded-full bg-[#fcb6c0] opacity-30 blur-xl" />
+                        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-xl shadow-pink-200/50">
+                            <Mail className="h-9 w-9 text-[#a488ea]" />
                         </div>
                     </div>
-                    <h1 className="mt-6 text-2xl font-extrabold text-gray-900 tracking-tight text-center">
+                    <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white text-center">
                         Cek Email Anda
                     </h1>
-                    <p className="mt-2 text-sm text-gray-500 text-center leading-relaxed px-2">
+                    <p className="max-w-[260px] text-center text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                         Kami telah mengirimkan link verifikasi ke email yang Anda gunakan untuk login.
                     </p>
                 </div>
 
-                {/* Card Body */}
-                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                {/* Card */}
+                <div className="overflow-hidden rounded-3xl bg-white shadow-2xl shadow-pink-100/60 dark:bg-slate-900 dark:shadow-slate-950/60">
                     <div className="p-6">
-
                         {/* Success Message */}
                         {successMsg && (
-                            <div className="mb-5 rounded-2xl bg-green-50 border border-green-100 p-4 flex gap-3 items-start">
-                                <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                                <p className="text-sm text-green-700 leading-relaxed">{successMsg}</p>
+                            <div className="mb-5 flex items-start gap-3 rounded-2xl border border-green-100 bg-green-50 p-4">
+                                <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                                <p className="text-sm leading-relaxed text-green-700">{successMsg}</p>
                             </div>
                         )}
 
                         {/* Instructions */}
-                        <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 mb-6">
-                            <p className="text-sm text-blue-800 text-center leading-relaxed">
+                        <div className="mb-6 rounded-2xl border border-[#d4cafc] bg-[#f3effd] p-4 dark:border-[#a488ea]/20 dark:bg-[#a488ea]/10">
+                            <p className="text-center text-sm leading-relaxed text-[#5c42b5] dark:text-[#b49ef5]">
                                 Buka email Anda dan klik tombol{' '}
-                                <span className="font-semibold text-blue-900">Verifikasi Akun</span>{' '}
+                                <span className="font-bold text-[#7c64d5] dark:text-[#d4cafc]">Verifikasi Akun</span>{' '}
                                 untuk melanjutkan dan memasukkan NIM Anda.
                             </p>
                         </div>
 
                         {/* Resend Section */}
                         <div className="flex flex-col items-center gap-3">
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+                            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                                 Tidak menerima email?
                             </p>
                             <button
                                 onClick={handleResend}
                                 disabled={processing}
-                                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gray-50 border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:border-gray-300 active:scale-95 disabled:opacity-50 transition-all duration-200"
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition-all duration-200 hover:border-slate-300 hover:bg-slate-100 active:scale-95 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                             >
-                                <RefreshCw className={`h-4 w-4 text-gray-500 ${processing ? 'animate-spin' : ''}`} />
+                                <RefreshCw className={`h-4 w-4 text-slate-500 ${processing ? 'animate-spin' : ''}`} />
                                 {processing ? 'Mengirim...' : 'Kirim Ulang Email'}
                             </button>
                         </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="border-t border-gray-100"></div>
-
-                    {/* Footer Link */}
-                    <div className="px-6 py-4 bg-gray-50">
-                        <p className="text-xs text-center text-gray-400 mb-3">Sudah klik link?</p>
-                        <Link
-                            href="/dashboard"
-                            className="flex items-center justify-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                        >
-                            Kembali ke Dashboard
-                            <ArrowRight className="h-4 w-4" />
-                        </Link>
+                    {/* Footer */}
+                    <div className="border-t border-slate-100 dark:border-slate-800">
+                        <div className="bg-slate-50 px-6 py-4 dark:bg-slate-900/50">
+                            <p className="mb-3 text-center text-xs text-slate-400">Sudah klik link?</p>
+                            <Link
+                                href="/dashboard"
+                                className="flex items-center justify-center gap-1.5 text-sm font-bold text-[#a488ea] transition-colors hover:text-[#8b6fe0] dark:text-[#b49ef5]"
+                            >
+                                Kembali ke Dashboard
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
-                {/* Bottom hint */}
-                <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed px-4">
-                    Jika email tidak masuk, cek folder <span className="font-medium text-gray-500">Spam</span> atau hubungi admin.
+                <p className="mt-6 px-4 text-center text-xs leading-relaxed text-slate-400">
+                    Jika email tidak masuk, cek folder <span className="font-medium text-slate-500">Spam</span> atau hubungi admin.
                 </p>
             </div>
         </div>
     );
 }
+

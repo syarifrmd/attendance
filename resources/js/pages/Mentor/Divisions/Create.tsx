@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+﻿import { Head, Link, useForm } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -117,7 +117,7 @@ export default function DivisionCreate() {
                                     key={day.value}
                                     className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-sm transition ${
                                         data.work_days.includes(day.value)
-                                            ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                                            ? 'border-[#c4b5fa] bg-[#f3effd] text-[#7c64d5]'
                                             : 'border-slate-200 bg-white text-slate-700'
                                     }`}
                                 >
@@ -125,7 +125,7 @@ export default function DivisionCreate() {
                                         type="checkbox"
                                         checked={data.work_days.includes(day.value)}
                                         onChange={() => toggleDay(day.value)}
-                                        className="h-4 w-4 rounded border-slate-300 text-indigo-600"
+                                        className="h-4 w-4 rounded border-slate-300 text-[#a488ea]"
                                     />
                                     {day.label}
                                 </label>
@@ -169,3 +169,4 @@ export default function DivisionCreate() {
         </ManagerLayout>
     );
 }
+

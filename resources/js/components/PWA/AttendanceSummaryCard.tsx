@@ -9,26 +9,25 @@ interface AttendanceSummaryProps {
 
 export default function AttendanceSummaryCard({ totalDays, daysAttended, daysAbsent }: AttendanceSummaryProps) {
     const percentage = Math.round((daysAttended / totalDays) * 100) || 0;
-    
-    // For a half-donut pie chart
+
     const data = [
         { name: 'Attended', value: daysAttended },
-        { name: 'Remaining/Absent', value: totalDays - daysAttended }
+        { name: 'Remaining/Absent', value: totalDays - daysAttended },
     ];
 
-    const COLORS = ['#ffffff', 'rgba(255,255,255,0.3)'];
+    const COLORS = ['rgba(255,255,255,0.95)', 'rgba(255,255,255,0.25)'];
 
     return (
-        <div className="bg-indigo-500 rounded-2xl p-6 text-white shadow-xl shadow-indigo-200/50 mb-6">
-            <h3 className="text-indigo-100 font-medium mb-1">Attendance Summary</h3>
-            
-            <div className="flex items-center justify-between mt-2">
+        <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#fcb6c0] via-[#cc9ff0] to-[#b490f0] p-6 text-white shadow-xl shadow-pink-200/50 dark:shadow-purple-950/40">
+            <h3 className="mb-1 font-medium text-white/80">Ringkasan Kehadiran</h3>
+
+            <div className="mt-2 flex items-center justify-between">
                 <div>
-                    <div className="text-sm text-indigo-200">Total Days</div>
+                    <div className="text-sm text-white/70">Total Hari</div>
                     <div className="text-2xl font-bold">{totalDays}</div>
                 </div>
 
-                <div className="w-24 h-24 relative -mr-2">
+                <div className="relative -mr-2 h-24 w-24">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -50,20 +49,20 @@ export default function AttendanceSummaryCard({ totalDays, daysAttended, daysAbs
                             </Pie>
                         </PieChart>
                     </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center top-3">
+                    <div className="absolute inset-0 top-3 flex flex-col items-center justify-center">
                         <span className="text-lg font-bold">{percentage}%</span>
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-6 border-t border-indigo-400/30 pt-4">
+            <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/20 pt-4">
                 <div>
-                    <div className="text-xs text-indigo-200 mb-1">Days Attended</div>
-                    <div className="font-semibold">{daysAttended}</div>
+                    <div className="mb-1 text-xs text-white/70">Hadir</div>
+                    <div className="font-semibold">{daysAttended} hari</div>
                 </div>
                 <div>
-                    <div className="text-xs text-indigo-200 mb-1">Days Absent/Leaves</div>
-                    <div className="font-semibold">{daysAbsent}</div>
+                    <div className="mb-1 text-xs text-white/70">Absen / Izin</div>
+                    <div className="font-semibold">{daysAbsent} hari</div>
                 </div>
             </div>
         </div>

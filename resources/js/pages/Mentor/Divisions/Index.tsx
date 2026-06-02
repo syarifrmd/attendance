@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 
 interface Division {
@@ -40,7 +40,7 @@ export default function DivisionIndex({ divisions }: { divisions: Division[] }) 
                 </div>
                 <Link
                     href={`${prefix}/divisions/create`}
-                    className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                    className="inline-flex items-center justify-center rounded-xl bg-[#a488ea] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8b6fe0]"
                 >
                     Tambah Divisi
                 </Link>
@@ -121,3 +121,4 @@ export default function DivisionIndex({ divisions }: { divisions: Division[] }) 
         </ManagerLayout>
     );
 }
+

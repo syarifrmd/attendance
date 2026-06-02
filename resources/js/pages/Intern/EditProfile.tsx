@@ -1,4 +1,4 @@
-import { useForm, Link } from '@inertiajs/react';
+﻿import { useForm, Link } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import toast, { Toaster } from 'react-hot-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
@@ -63,7 +63,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
             </div>
 
             <div className="mb-6 flex flex-col items-center justify-center rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-800/40 p-6 shadow-sm">
-                <div className="mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-indigo-100 dark:border-indigo-950 bg-gray-50 dark:bg-slate-900">
+                <div className="mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-[#d4cafc] dark:border-[#a488ea]/30 bg-slate-50 dark:bg-slate-900">
                     <img
                         src={
                             profile?.foto
@@ -78,7 +78,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                 <p className="mb-4 text-center text-xs text-gray-500 dark:text-slate-400">Foto digunakan untuk verifikasi kehadiran</p>
                 <Link
                     href="/intern/setup-profile"
-                    className="rounded-full bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-500/20"
+                    className="rounded-full bg-[#f3effd] dark:bg-[#a488ea]/10 px-4 py-2 text-xs font-semibold text-[#a488ea] dark:text-[#b49ef5] transition-colors hover:bg-[#e8e0fc] dark:hover:bg-[#a488ea]/20"
                 >
                     Perbarui Foto Wajah (Opsional)
                 </Link>
@@ -93,7 +93,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                         type="text"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                         placeholder="Masukkan nama lengkap Anda"
                     />
                     {errors.name && (
@@ -111,7 +111,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                         type="text"
                         value={data.asal_kampus}
                         onChange={(e) => setData('asal_kampus', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                         placeholder="Universitas / SMK asal"
                     />
                     {errors.asal_kampus && (
@@ -128,7 +128,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                     <select
                         value={data.division_id}
                         onChange={(e) => setData('division_id', e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                     >
                         <option value="" className="text-gray-900 dark:text-slate-400 dark:bg-slate-800">Pilih Divisi...</option>
                         {divisions.map((d) => (
@@ -154,7 +154,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                         max="365"
                         value={data.internship_duration_days}
                         onChange={(e) => setData('internship_duration_days', parseInt(e.target.value) || 0)}
-                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                         placeholder="Contoh: 90"
                     />
                     {errors.internship_duration_days && (
@@ -167,7 +167,7 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
                 <button
                     type="submit"
                     disabled={processing}
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-transform active:scale-[0.98]"
+                    className="btn-brand mt-6 flex w-full items-center justify-center gap-2 py-4 font-semibold"
                 >
                     {processing ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -178,3 +178,4 @@ export default function EditProfile({ user, divisions = [] }: { user: UserData, 
         </MobileLayout>
     );
 }
+

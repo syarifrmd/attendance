@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+﻿import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import MentorLayout from '@/layouts/MentorLayout';
 import {
@@ -104,12 +104,12 @@ export default function MentorDashboard({ interns = [], filters }: Props) {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={handleKey}
-                        className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 py-2.5 pl-9 pr-4 text-sm focus:border-indigo-400 focus:outline-none dark:text-slate-200 dark:placeholder-slate-500"
+                        className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 py-2.5 pl-9 pr-4 text-sm focus:border-[#a488ea] focus:outline-none dark:text-slate-200 dark:placeholder-slate-500"
                     />
                 </div>
                 <button
                     onClick={applySearch}
-                    className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                    className="rounded-xl bg-[#a488ea] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#8b6fe0] dark:bg-[#a488ea] dark:hover:bg-[#a488ea]"
                 >
                     Cari
                 </button>
@@ -231,3 +231,4 @@ export default function MentorDashboard({ interns = [], filters }: Props) {
         </MentorLayout>
     );
 }
+

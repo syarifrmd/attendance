@@ -1,4 +1,4 @@
-import { useForm, router } from '@inertiajs/react';
+﻿import { useForm, router } from '@inertiajs/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import MobileLayout from '@/layouts/MobileLayout';
 import toast, { Toaster } from 'react-hot-toast';
@@ -520,13 +520,13 @@ export default function AttendanceForm({
     const renderWFORequirements = () => (
         <>
             {/* Geolocation Section */}
-            <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20 p-4">
+            <div className="rounded-xl border border-[#d4cafc] dark:border-[#a488ea]/20 bg-[#f3effd]/50 dark:bg-[#a488ea]/10 p-4">
                 <div className="mb-3 flex items-center justify-between">
                     <div>
-                        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-200">
+                        <h3 className="text-sm font-semibold text-[#5c42b5] dark:text-[#b49ef5]">
                             Lokasi Saat Ini
                         </h3>
-                        <p className="text-xs text-blue-700/70 dark:text-blue-400/80">
+                        <p className="text-xs text-[#a488ea]/80 dark:text-[#b49ef5]/70">
                             Diperlukan untuk validasi area
                         </p>
                     </div>
@@ -534,7 +534,7 @@ export default function AttendanceForm({
                         type="button"
                         onClick={getLocation}
                         disabled={locationStatus === 'locating'}
-                        className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+                        className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#fcb6c0] to-[#b490f0] px-3 py-2 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                     >
                         {locationStatus === 'locating' ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -547,7 +547,7 @@ export default function AttendanceForm({
                     </button>
                 </div>
                 {data.latitude && (
-                    <p className="rounded bg-blue-100 dark:bg-blue-950/40 p-2 font-mono text-xs text-blue-800 dark:text-blue-300">
+                    <p className="rounded bg-[#ede8fc] dark:bg-[#a488ea]/20 p-2 font-mono text-xs text-[#5c42b5] dark:text-[#b49ef5]">
                         Lat: {data.latitude.substring(0, 10)}
                         <br />
                         Lng: {data.longitude.substring(0, 10)}
@@ -577,7 +577,7 @@ export default function AttendanceForm({
                             type="button"
                             onClick={() => startCamera()}
                             disabled={!modelsLoaded}
-                            className="rounded-lg bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-500/20 disabled:opacity-50"
+                            className="rounded-lg bg-[#f3effd] dark:bg-[#a488ea]/10 px-3 py-1.5 text-sm font-medium text-[#a488ea] dark:text-[#b49ef5] transition-colors hover:bg-[#e8e0fc] dark:hover:bg-[#a488ea]/20 disabled:opacity-50"
                         >
                             Buka Kamera
                         </button>
@@ -609,7 +609,7 @@ export default function AttendanceForm({
                                 type="button"
                                 onClick={handleCaptureFace}
                                 disabled={isDetecting || !modelsLoaded}
-                                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-indigo-600 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
+                                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-[#a488ea] shadow-lg transition-transform active:scale-95 disabled:opacity-50"
                             >
                                 {isDetecting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                                 Scan Wajah
@@ -660,12 +660,12 @@ export default function AttendanceForm({
 
             {/* Work Schedule Info */}
             {work_schedule && (
-                <div className="mb-4 flex items-center gap-3 rounded-xl border border-indigo-100 dark:border-indigo-950 bg-indigo-50/60 dark:bg-indigo-950/20 px-4 py-3">
-                    <Clock className="h-4 w-4 text-indigo-500" />
-                    <div className="text-xs text-indigo-700 dark:text-indigo-300">
+                <div className="mb-4 flex items-center gap-3 rounded-xl border border-[#d4cafc] dark:border-[#a488ea]/20 bg-[#f3effd]/60 dark:bg-[#a488ea]/10 px-4 py-3">
+                    <Clock className="h-4 w-4 text-[#a488ea]" />
+                    <div className="text-xs text-[#7c64d5] dark:text-[#b49ef5]">
                         <span className="font-semibold">Jam Kerja:</span>{' '}
                         {work_schedule.start_time} – {work_schedule.end_time}
-                        <span className="ml-2 text-indigo-400 dark:text-indigo-400">
+                        <span className="ml-2 text-[#a488ea]/70 dark:text-[#b49ef5]/60">
                             (Presensi pulang setelah jam {work_schedule.end_time})
                         </span>
                     </div>
@@ -783,17 +783,17 @@ export default function AttendanceForm({
                 <>
 
                     {/* Toggle Tabs - 3 tabs */}
-                    <div className="mb-6 flex rounded-xl bg-gray-100 dark:bg-slate-800 p-1 transition-colors">
+                    <div className="mb-6 flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 transition-colors">
                         <button type="button" onClick={() => { setActiveTab('wfo'); setData((p) => ({ ...p, status: 'wfo', latitude: '', longitude: '', face_verification_image: null, reason: '', proof_image: null })); setLocationStatus('pending'); setGeoError(null); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfo' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfo' ? 'bg-white dark:bg-slate-700 text-[#a488ea] dark:text-[#b49ef5] shadow-sm font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
                             WFO
                         </button>
                         <button type="button" onClick={() => { setActiveTab('wfhwfa'); setData((p) => ({ ...p, status: 'wfh', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfhwfa' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'wfhwfa' ? 'bg-white dark:bg-slate-700 text-[#a488ea] dark:text-[#b49ef5] shadow-sm font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
                             WFH / WFA
                         </button>
                         <button type="button" onClick={() => { setActiveTab('offsite'); setData((p) => ({ ...p, status: 'izin', latitude: '', longitude: '', face_verification_image: null })); stopCamera(); }}
-                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'offsite' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-slate-400'}`}>
+                            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${activeTab === 'offsite' ? 'bg-white dark:bg-slate-700 text-[#a488ea] dark:text-[#b49ef5] shadow-sm font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
                             Izin / Sakit
                         </button>
                     </div>
@@ -808,7 +808,7 @@ export default function AttendanceForm({
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value)}
                                 disabled={activeTab === 'wfo'}
-                                className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 dark:disabled:bg-slate-900/50 disabled:text-gray-500 dark:disabled:text-slate-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                             >
                                 {activeTab === 'wfo' && <option value="wfo" className="text-gray-900 dark:text-slate-100 dark:bg-slate-800">Work From Office (WFO)</option>}
                                 {activeTab === 'wfhwfa' && (
@@ -843,7 +843,7 @@ export default function AttendanceForm({
                                         value={data.reason}
                                         onChange={(e) => setData('reason', e.target.value)}
                                         rows={3}
-                                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 p-3 shadow-sm focus:border-[#a488ea] focus:ring-[#a488ea]"
                                         placeholder={`Jelaskan alasan ${activeTab === 'offsite' ? 'izin / sakit' : 'WFH / WFA'}...`}
                                     />
                                     {errors.reason && <p className="mt-1 text-xs text-red-500">{errors.reason}</p>}
@@ -872,7 +872,7 @@ export default function AttendanceForm({
                         <button
                             type="submit"
                             disabled={processing}
-                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-transform active:scale-[0.98]"
+                            className="btn-brand mt-6 flex w-full items-center justify-center gap-2 py-4 font-semibold"
                         >
                             {processing ? (
                                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -885,3 +885,4 @@ export default function AttendanceForm({
         </MobileLayout>
     );
 }
+

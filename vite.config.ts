@@ -68,7 +68,23 @@ export default defineConfig({
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
                 navigateFallback: null,
+                cleanupOutdatedCaches: true,
                 runtimeCaching: [
+                    {
+                        urlPattern: ({ request }) => request.mode === 'navigate' || request.headers.get('x-inertia') === 'true' || request.headers.get('accept')?.includes('text/html'),
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'pages-and-inertia-data',
+                            networkTimeoutSeconds: 5,
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 60 * 60 * 24 * 7, // 1 week
+                            },
+                            cacheableResponse: {
+                                statuses: [200],
+                            },
+                        },
+                    },
                     {
                         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
                         handler: 'CacheFirst',

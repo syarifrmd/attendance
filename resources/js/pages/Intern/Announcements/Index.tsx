@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import { ArrowLeft, Megaphone, Download, FileText, CheckCheck, Clock, User } from 'lucide-react';
@@ -107,7 +107,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
             {/* Sub-header / Actions */}
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Megaphone className="text-indigo-500 dark:text-indigo-400" size={18} />
+                    <Megaphone className="text-indigo-500 dark:text-[#b49ef5]" size={18} />
                     <span className="text-xs font-semibold text-gray-500 dark:text-slate-400">
                         {announcements.length} Pengumuman Tersedia
                     </span>
@@ -115,7 +115,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                 {unreadCount > 0 && (
                     <button
                         onClick={handleMarkAllRead}
-                        className="flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1.5 text-[10px] font-bold text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 transition-colors"
+                        className="flex items-center gap-1 rounded-lg bg-[#f3effd] px-2.5 py-1.5 text-[10px] font-bold text-[#a488ea] hover:bg-[#e8e0fc] dark:bg-[#f3effd]0/10 dark:text-[#b49ef5] dark:hover:bg-[#f3effd]0/20 transition-colors"
                     >
                         <CheckCheck size={12} />
                         Tandai semua dibaca
@@ -135,13 +135,13 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                             onClick={() => handleAnnouncementClick(item)}
                             className={`group relative cursor-pointer rounded-2xl border p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
                                 isUnread
-                                    ? 'border-indigo-200 bg-indigo-50/10 dark:border-indigo-500/20 dark:bg-indigo-500/5'
+                                    ? 'border-[#d4cafc] bg-[#f3effd]/10 dark:border-indigo-500/20 dark:bg-[#f3effd]0/5'
                                     : 'border-gray-100 bg-white dark:border-slate-800/80 dark:bg-slate-900'
                             }`}
                         >
                             {/* Blue Dot Indicator for Unread */}
                             {isUnread && (
-                                <span className="absolute right-4 top-4 flex h-2 w-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse" />
+                                <span className="absolute right-4 top-4 flex h-2 w-2 rounded-full bg-[#a488ea] dark:bg-indigo-400 animate-pulse" />
                             )}
 
                             <div className="mb-3 flex items-center gap-2">
@@ -149,20 +149,20 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                                     className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
                                         item.division_id
                                             ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400'
-                                            : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400'
+                                            : 'bg-[#e8e0fc] text-[#7c64d5] dark:bg-[#f3effd]0/20 dark:text-[#b49ef5]'
                                     }`}
                                 >
                                     {item.division_id ? `Divisi ${item.division?.name}` : 'Semua Divisi'}
                                 </span>
                                 
                                 {isUnread && (
-                                    <span className="rounded-full bg-indigo-600 px-2 py-0.5 text-[9px] font-extrabold uppercase text-white dark:bg-indigo-500 tracking-wider">
+                                    <span className="rounded-full bg-[#a488ea] px-2 py-0.5 text-[9px] font-extrabold uppercase text-white dark:bg-[#a488ea] tracking-wider">
                                         Baru
                                     </span>
                                 )}
                             </div>
 
-                            <h2 className={`mb-2 text-sm font-bold transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${
+                            <h2 className={`mb-2 text-sm font-bold transition-colors group-hover:text-[#a488ea] dark:group-hover:text-[#b49ef5] ${
                                 isUnread ? 'text-gray-900 dark:text-slate-100 font-extrabold' : 'text-gray-800 dark:text-slate-200'
                             }`}>
                                 {item.title}
@@ -176,7 +176,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                             {/* Small Attachment Preview Icon */}
                             {item.attachment_url && (
                                 <div className="mb-3 flex items-center gap-1.5 rounded-lg bg-gray-50/50 p-2 dark:bg-slate-800/40 border border-gray-100/30 dark:border-slate-800/30 text-[10px] text-gray-500 dark:text-slate-400 font-medium">
-                                    <FileText size={12} className="text-indigo-500 dark:text-indigo-400" />
+                                    <FileText size={12} className="text-indigo-500 dark:text-[#b49ef5]" />
                                     <span className="truncate max-w-[200px]">{item.attachment_name}</span>
                                 </div>
                             )}
@@ -235,7 +235,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                                 <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
                                     selectedAnnouncement.division_id
                                         ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400'
-                                        : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400'
+                                        : 'bg-[#e8e0fc] text-[#7c64d5] dark:bg-[#f3effd]0/20 dark:text-[#b49ef5]'
                                 }`}>
                                     {selectedAnnouncement.division_id ? `Divisi ${selectedAnnouncement.division?.name}` : 'Semua Divisi'}
                                 </span>
@@ -299,7 +299,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                                     ) : (
                                         <div className="flex items-center justify-between rounded-xl bg-gray-50 p-3 dark:bg-slate-800/40 border border-gray-100/50 dark:border-slate-800/50">
                                             <div className="flex items-center gap-2.5 overflow-hidden">
-                                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+                                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#f3effd] text-[#a488ea] dark:bg-[#f3effd]0/10 dark:text-[#b49ef5]">
                                                     <FileText size={16} />
                                                 </div>
                                                 <div className="overflow-hidden">
@@ -316,7 +316,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                                                 download={selectedAnnouncement.attachment_name || 'document'}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors border border-gray-100 dark:border-slate-700"
+                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:text-[#a488ea] dark:hover:text-[#b49ef5] shadow-sm transition-colors border border-gray-100 dark:border-slate-700"
                                             >
                                                 <Download size={14} />
                                             </a>
@@ -326,7 +326,7 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
                             )}
 
                             <div className="border-t border-gray-50 pt-3 dark:border-slate-800/60 flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
-                                <div className="h-6 w-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-[10px]">
+                                <div className="h-6 w-6 rounded-full bg-[#e8e0fc] dark:bg-[#f3effd]0/20 text-[#a488ea] dark:text-[#b49ef5] flex items-center justify-center font-bold text-[10px]">
                                     {selectedAnnouncement.author?.name ? selectedAnnouncement.author.name[0].toUpperCase() : 'M'}
                                 </div>
                                 <div className="flex flex-col">
@@ -345,3 +345,4 @@ export default function AnnouncementsIndex({ announcements = [], notifications =
         </MobileLayout>
     );
 }
+

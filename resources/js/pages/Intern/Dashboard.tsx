@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+﻿import { Link, router } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import AttendanceSummaryCard from '@/components/PWA/AttendanceSummaryCard';
 import { Clock, Bell, ChevronRight } from 'lucide-react';
@@ -98,7 +98,7 @@ export default function Dashboard({
             case 'sakit':
                 return 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400';
             default:
-                return 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-400';
+                return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
         }
     };
 
@@ -122,52 +122,18 @@ export default function Dashboard({
                     </div>
                     <Link
                         href="/intern/announcements"
-                        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-[#a488ea] dark:hover:text-[#b49ef5] transition-colors"
                     >
                         <Bell size={20} />
                         {auth.unread_notifications_count !== undefined && auth.unread_notifications_count > 0 && (
-                            <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-slate-900 animate-pulse">
+                            <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-[#fcb6c0] to-[#b490f0] px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-slate-900 animate-pulse">
                                 {auth.unread_notifications_count}
                             </span>
                         )}
                     </Link>
                 </div>
 
-                {/* Announcements / News Section */}
-                {announcements.length > 0 && (
-                    <div className="mb-6">
-                        <div className="mb-3 flex items-center gap-2">
-                            <Bell size={16} className="text-indigo-500 dark:text-indigo-400" />
-                            <h2 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
-                                Pengumuman
-                            </h2>
-                        </div>
-                        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-                            {announcements.slice(0, 5).map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="min-w-[240px] max-w-[280px] flex-shrink-0 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/50 dark:bg-indigo-500/10 p-4"
-                                >
-                                    <h3 className="mb-1 text-sm font-semibold text-gray-900 dark:text-slate-100 line-clamp-1">
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-xs text-gray-600 dark:text-slate-400 line-clamp-2">
-                                        {item.content ? item.content.replace(/<[^>]*>?/gm, '') : ''}
-                                    </p>
-                                    <p className="mt-2 text-[10px] text-gray-400 dark:text-slate-500">
-                                        {new Date(
-                                            item.created_at,
-                                        ).toLocaleDateString('id-ID', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                        })}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
 
                 {/* Attendance Summary Card */}
                 <AttendanceSummaryCard
@@ -184,7 +150,7 @@ export default function Dashboard({
                         </h2>
                         <Link
                             href="/intern/attendance/history"
-                            className="flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-400"
+                            className="flex items-center gap-1 text-sm font-medium text-[#a488ea] dark:text-[#b49ef5]"
                         >
                             Lihat semua
                             <ChevronRight size={14} />
@@ -245,3 +211,4 @@ export default function Dashboard({
         </MobileLayout>
     );
 }
+

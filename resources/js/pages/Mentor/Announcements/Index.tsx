@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+﻿import { Head, router } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import { useState, useRef } from 'react';
 import { Megaphone, Plus, Trash2, X, FileText, Bold, Italic, Underline, List, ListOrdered } from 'lucide-react';
@@ -157,7 +157,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                            <Megaphone className="text-indigo-600 dark:text-indigo-400" /> Pengumuman
+                            <Megaphone className="text-[#a488ea] dark:text-[#b49ef5]" /> Pengumuman
                         </h1>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             Kelola pengumuman untuk seluruh intern atau divisi tertentu.
@@ -165,7 +165,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                     </div>
                     <button
                         onClick={handleOpenModal}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                        className="flex items-center justify-center gap-2 rounded-xl bg-[#a488ea] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#8b6fe0] transition-colors dark:bg-[#a488ea] dark:hover:bg-[#a488ea]"
                     >
                         <Plus size={18} />
                         Tambah Pengumuman
@@ -178,7 +178,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                             <div>
                                 <div className="flex items-start justify-between">
                                     <div className="flex gap-2">
-                                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${announcement.division_id ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400'}`}>
+                                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${announcement.division_id ? 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400' : 'bg-[#e8e0fc] text-[#7c64d5] dark:bg-[#f3effd]0/20 dark:text-[#b49ef5]'}`}>
                                             {announcement.division_id ? `Divisi ${announcement.division?.name}` : 'Semua Divisi'}
                                         </span>
                                     </div>
@@ -204,7 +204,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                             href={announcement.attachment_url} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                                            className="inline-flex items-center gap-1.5 text-xs text-[#a488ea] dark:text-[#b49ef5] hover:underline font-semibold"
                                         >
                                             <FileText size={14} />
                                             <span className="truncate max-w-[180px]">{announcement.attachment_name}</span>
@@ -241,7 +241,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                 <select
                                     value={addForm.division_id}
                                     onChange={e => setAddForm({ ...addForm, division_id: e.target.value })}
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-[#a488ea] focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                 >
                                     <option value="">Semua Divisi (Global)</option>
                                     {divisions.map(d => (
@@ -256,7 +256,7 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                     required
                                     value={addForm.title}
                                     onChange={e => setAddForm({ ...addForm, title: e.target.value })}
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:border-[#a488ea] focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
                                     placeholder="Contoh: Jadwal Libur Lebaran"
                                 />
                             </div>
@@ -273,14 +273,14 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
                                 <input
                                     type="file"
                                     onChange={e => setAddForm({ ...addForm, attachment: e.target.files ? e.target.files[0] : null })}
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 file:mr-4 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-700 dark:file:text-indigo-400"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-[#a488ea] focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 file:mr-4 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#f3effd] file:text-[#7c64d5] hover:file:bg-[#e8e0fc] dark:file:bg-slate-700 dark:file:text-[#b49ef5]"
                                     accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
                                 />
                                 <p className="mt-1 text-[10px] text-slate-400">Format: JPG, PNG, PDF, Word, Excel. Maksimal 5MB.</p>
                             </div>
                             <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
                                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Batal</button>
-                                <button type="submit" disabled={addLoading} className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                                <button type="submit" disabled={addLoading} className="rounded-xl bg-[#a488ea] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#8b6fe0] disabled:opacity-50 dark:bg-[#a488ea] dark:hover:bg-[#a488ea]">
                                     {addLoading ? 'Menyimpan...' : 'Sebarkan Pengumuman'}
                                 </button>
                             </div>
@@ -291,3 +291,4 @@ export default function AnnouncementsIndex({ announcements, divisions }: { annou
         </ManagerLayout>
     );
 }
+

@@ -53,35 +53,45 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
             <Head title={title} />
 
             {/* Desktop Sidebar */}
-            <aside className="hidden w-64 flex-col bg-indigo-900 text-white md:flex">
-                <div className="border-b border-indigo-800 p-6 text-xl font-bold tracking-tight">
-                    <div className="flex items-center gap-2">
-                        <LayoutDashboard size={22} />
-                        <span>Mentor</span>
+            <aside className="hidden w-64 flex-col text-white shadow-2xl md:flex dark:from-slate-900 dark:to-slate-950"
+                style={{ background: 'linear-gradient(160deg, #5c42b5 0%, #3a257c 100%)' }}
+            >
+                {/* Brand Header */}
+                <div className="border-b border-white/25 p-6">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25 shadow-inner backdrop-blur-sm ring-1 ring-white/30">
+                            <LayoutDashboard size={20} className="text-white drop-shadow-sm" />
+                        </div>
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/60">Panel</p>
+                            <p className="text-base font-extrabold tracking-tight text-white drop-shadow-sm">Mentor</p>
+                        </div>
                     </div>
                 </div>
-                <nav className="flex-1 space-y-1 px-4 py-6">
+
+                <nav className="flex-1 space-y-0.5 px-3 py-5">
                     {navItems.map((item) => (
                         <Link
                             key={item.name}
                             href={item.href}
-                            className={`flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-colors ${
+                            className={`group flex items-center gap-3 rounded-2xl px-4 py-3 font-medium transition-all ${
                                 item.active
-                                    ? 'bg-indigo-800 text-indigo-50'
-                                    : 'text-indigo-200 hover:bg-indigo-800/50 hover:text-indigo-50'
+                                    ? 'bg-gradient-to-r from-[#fcb6c0] to-[#b490f0] text-white shadow-md'
+                                    : 'text-white/65 hover:bg-white/10 hover:text-white'
                             }`}
                         >
-                            <item.icon size={20} />
+                            <item.icon size={20} className={item.active ? 'text-white drop-shadow-sm' : 'text-white/50 group-hover:text-white/80'} />
                             {item.name}
                         </Link>
                     ))}
                 </nav>
-                <div className="border-t border-indigo-800 p-4">
+
+                <div className="border-t border-white/20 p-4">
                     <Link
                         href="/logout"
                         method="post"
                         as="button"
-                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-rose-300 transition-colors hover:bg-rose-500/20 hover:text-rose-200"
+                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-white/70 transition-colors hover:bg-white/15 hover:text-white"
                     >
                         <LogOut size={20} />
                         Logout
@@ -96,7 +106,7 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                     <h1 className="text-xl font-semibold text-gray-800">
                         {title}
                     </h1>
-                    <div className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 rounded-full bg-[#f3effd] px-4 py-1 text-sm font-medium text-[#a488ea] ring-1 ring-[#d4cafc]">
                         <span>Role: Mentor</span>
                     </div>
                 </header>
@@ -129,8 +139,8 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                                         item.active
-                                            ? 'bg-indigo-50 text-indigo-700'
-                                            : 'text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-[#f3effd] text-[#a488ea]'
+                                            : 'text-slate-600 hover:bg-slate-50'
                                     }`}
                                 >
                                     <item.icon size={18} />
@@ -158,3 +168,4 @@ export default function MentorLayout({ title, children }: MentorLayoutProps) {
         </div>
     );
 }
+

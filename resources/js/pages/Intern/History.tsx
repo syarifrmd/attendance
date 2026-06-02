@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import MobileLayout from '@/layouts/MobileLayout';
 import { Clock, MapPin, Calendar, FileText } from 'lucide-react';
 
@@ -94,3 +94,4 @@ export default function History({ attendances }: HistoryProps) {
         </MobileLayout>
     );
 }
+

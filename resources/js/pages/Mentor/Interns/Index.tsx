@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+﻿import { Head, Link, router, usePage } from '@inertiajs/react';
 import ManagerLayout from '@/layouts/ManagerLayout';
 import { useState } from 'react';
 import {
@@ -165,7 +165,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                     </button>
                     <button
                         onClick={() => setAddModal(true)}
-                        className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                        className="flex items-center gap-1.5 rounded-xl bg-[#a488ea] px-3 py-2 text-xs font-semibold text-white hover:bg-[#8b6fe0] transition-colors dark:bg-[#a488ea] dark:hover:bg-[#a488ea]"
                     >
                         <UserPlus size={14} /> <span className="hidden sm:inline">Tambah Intern</span>
                     </button>
@@ -179,12 +179,12 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                 </button>
                 <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-3">
                     <div className="flex items-center gap-2">
-                        <CalendarDays size={16} className="text-indigo-500 dark:text-indigo-400" />
+                        <CalendarDays size={16} className="text-indigo-500 dark:text-[#b49ef5]" />
                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{formatDateID(date)}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        {isToday(date) && <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">Hari Ini</span>}
-                        <input type="date" value={date} onChange={e => { setDate(e.target.value); navigate(e.target.value); }} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs focus:outline-none focus:border-indigo-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
+                        {isToday(date) && <span className="rounded-full bg-[#e8e0fc] px-2 py-0.5 text-xs font-medium text-[#7c64d5] dark:bg-[#f3effd]0/20 dark:text-[#d4cafc]">Hari Ini</span>}
+                        <input type="date" value={date} onChange={e => { setDate(e.target.value); navigate(e.target.value); }} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs focus:outline-none focus:border-[#c4b5fa] dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
                     </div>
                 </div>
                 <button onClick={() => { const d = shiftDate(date, 1); setDate(d); navigate(d); }} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">
@@ -211,7 +211,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
             <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center dark:border-slate-700/60 dark:bg-slate-800">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <input type="text" placeholder="Cari nama atau email..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyFilters()} className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm focus:border-indigo-300 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
+                    <input type="text" placeholder="Cari nama atau email..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyFilters()} className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm focus:border-[#c4b5fa] focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200" />
                 </div>
                 <div className="flex gap-2">
                     <select value={divisionId} onChange={e => setDivisionId(e.target.value)} className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none sm:flex-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200">
@@ -221,7 +221,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                     <select value={todayStatus} onChange={e => setTodayStatus(e.target.value)} className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none sm:flex-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200">
                         {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
-                    <button onClick={applyFilters} className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                    <button onClick={applyFilters} className="flex items-center gap-1.5 rounded-xl bg-[#a488ea] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#8b6fe0] transition-colors dark:bg-[#a488ea] dark:hover:bg-[#a488ea]">
                         <SlidersHorizontal size={14} />
                     </button>
                     {(search || divisionId || todayStatus) && <button onClick={resetFilters} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-500 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700">Reset</button>}
@@ -265,7 +265,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                             <button onClick={() => openEdit(att)} className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"><Pencil size={11} /></button>
                                             <button onClick={() => handleDelete(att.id)} className="rounded-lg border border-rose-200 px-2.5 py-1 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-900/30"><Trash2 size={11} /></button>
                                         </>}
-                                        <Link href={`/mentor/interns/${intern.id}`} className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20">Detail <ChevronRight size={11} /></Link>
+                                        <Link href={`/mentor/interns/${intern.id}`} className="inline-flex items-center gap-1 rounded-lg bg-[#f3effd] px-3 py-1 text-xs font-semibold text-[#7c64d5] hover:bg-[#e8e0fc] dark:bg-[#f3effd]0/10 dark:text-[#b49ef5] dark:hover:bg-[#f3effd]0/20">Detail <ChevronRight size={11} /></Link>
                                     </div>
                                 </div>
                             </div>
@@ -333,7 +333,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                                     <button onClick={() => openEdit(att)} className="rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"><Pencil size={13} /></button>
                                                     <button onClick={() => handleDelete(att.id)} className="rounded-lg border border-rose-200 p-1.5 text-rose-500 hover:bg-rose-50 dark:border-rose-900/50 dark:hover:bg-rose-900/30"><Trash2 size={13} /></button>
                                                 </>}
-                                                <Link href={`/mentor/interns/${intern.id}`} className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10">Detail <ChevronRight size={11} /></Link>
+                                                <Link href={`/mentor/interns/${intern.id}`} className="inline-flex items-center gap-1 rounded-lg border border-[#d4cafc] px-3 py-1.5 text-xs font-semibold text-[#7c64d5] hover:bg-[#f3effd] dark:border-[#a488ea]/30 dark:text-[#b49ef5] dark:hover:bg-[#f3effd]0/10">Detail <ChevronRight size={11} /></Link>
                                             </div>
                                         </td>
                                     </tr>
@@ -346,7 +346,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                         <p className="text-sm text-slate-400">Halaman {interns.current_page} dari {interns.last_page} · {interns.total} intern</p>
                         <div className="flex gap-1">
                             {interns.links.map((link, i) => link.url
-                                ? <Link key={i} href={link.url} className={`rounded-lg px-3 py-1.5 text-sm transition ${link.active ? 'bg-indigo-600 font-semibold text-white dark:bg-indigo-500' : 'border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                ? <Link key={i} href={link.url} className={`rounded-lg px-3 py-1.5 text-sm transition ${link.active ? 'bg-[#a488ea] font-semibold text-white dark:bg-[#f3effd]0' : 'border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'}`} dangerouslySetInnerHTML={{ __html: link.label }} />
                                 : <span key={i} className="rounded-lg px-3 py-1.5 text-sm text-slate-300 dark:text-slate-600" dangerouslySetInnerHTML={{ __html: link.label }} />
                             )}
                         </div>
@@ -362,7 +362,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                         <div className="space-y-3">
                             <div>
                                 <label className="mb-1 block text-xs font-medium text-slate-600">Status</label>
-                                <select value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-300">
+                                <select value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:border-[#c4b5fa]">
                                     {['wfo','wfh','wfa','izin','sakit'].map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                                 </select>
                             </div>
@@ -383,7 +383,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                         </div>
                         <div className="mt-5 flex gap-2">
                             <button onClick={() => setEditModal(null)} className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Batal</button>
-                            <button onClick={submitEdit} className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Simpan</button>
+                            <button onClick={submitEdit} className="flex-1 rounded-xl bg-[#a488ea] py-2.5 text-sm font-semibold text-white hover:bg-[#8b6fe0]">Simpan</button>
                         </div>
                     </div>
                 </div>
@@ -407,8 +407,8 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                         {/* Modal Header */}
                         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100">
-                                    <UserPlus size={18} className="text-indigo-600" />
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e8e0fc]">
+                                    <UserPlus size={18} className="text-[#a488ea]" />
                                 </div>
                                 <div>
                                     <h3 className="text-base font-bold text-slate-900">Tambah Intern Baru</h3>
@@ -421,7 +421,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                         </div>
 
                         <div className="p-6 space-y-4">
-                            <div className="rounded-xl bg-indigo-50 px-4 py-3 text-xs text-indigo-700">
+                            <div className="rounded-xl bg-[#f3effd] px-4 py-3 text-xs text-[#7c64d5]">
                                 <strong>Cara kerja:</strong> Admin mendaftarkan NIM terlebih dahulu. Intern kemudian mendaftar via Google dan memasukkan NIM mereka untuk verifikasi akun.
                             </div>
 
@@ -435,7 +435,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                         value={addForm.nim}
                                         onChange={e => setAddForm({ ...addForm, nim: e.target.value })}
                                         placeholder="Nomor Induk Mahasiswa"
-                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400 ${addErrors.nim ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:border-[#a488ea] ${addErrors.nim ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
                                     />
                                     {addErrors.nim && <p className="mt-1 text-xs text-rose-500">{addErrors.nim}</p>}
                                     <p className="mt-1 text-xs text-slate-400">Harus unik, digunakan saat verifikasi</p>
@@ -447,7 +447,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                     <select
                                         value={addForm.division_id}
                                         onChange={e => setAddForm({ ...addForm, division_id: e.target.value })}
-                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400"
+                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-[#a488ea]"
                                     >
                                         <option value="">Pilih Divisi (Opsional)</option>
                                         {divisions.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -465,7 +465,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                         value={addForm.name}
                                         onChange={e => setAddForm({ ...addForm, name: e.target.value })}
                                         placeholder="Cth: Budi Santoso"
-                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400 ${addErrors.name ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
+                                        className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:border-[#a488ea] ${addErrors.name ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-slate-50'}`}
                                     />
                                     {addErrors.name && <p className="mt-1 text-xs text-rose-500">{addErrors.name}</p>}
                                 </div>
@@ -479,7 +479,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                         onChange={e => setAddForm({ ...addForm, internship_duration_days: e.target.value })}
                                         min="1"
                                         max="730"
-                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400"
+                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-[#a488ea]"
                                     />
                                 </div>
                             </div>
@@ -491,7 +491,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                 <select
                                     value={addForm.is_active ? '1' : '0'}
                                     onChange={e => setAddForm({ ...addForm, is_active: e.target.value === '1' })}
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-400"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm focus:outline-none focus:border-[#a488ea]"
                                 >
                                     <option value="1">Aktif (Tambahkan)</option>
                                     <option value="0">Tidak Aktif (Hapus Intern)</option>
@@ -507,7 +507,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                             <button
                                 onClick={submitAddDraft}
                                 disabled={addLoading || !addForm.nim || !addForm.name}
-                                className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 rounded-xl bg-[#a488ea] py-2.5 text-sm font-semibold text-white hover:bg-[#8b6fe0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {addLoading ? 'Menyimpan...' : 'Simpan Data'}
                             </button>
@@ -546,7 +546,7 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
                                     <tbody>
                                         {drafts.map(d => (
                                             <tr key={d.id} className="border-t border-slate-100 hover:bg-slate-50/60">
-                                                <td className="px-5 py-3 font-mono text-xs font-medium text-indigo-700">{d.nim}</td>
+                                                <td className="px-5 py-3 font-mono text-xs font-medium text-[#7c64d5]">{d.nim}</td>
                                                 <td className="px-5 py-3 font-medium text-slate-800">{d.name}</td>
                                                 <td className="px-5 py-3 text-slate-500">{d.division?.name || '-'}</td>
                                                 <td className="px-5 py-3 text-slate-500">{d.internship_duration_days} hari</td>
@@ -567,3 +567,4 @@ export default function MentorInternsIndex({ interns, divisions, filters, select
         </ManagerLayout>
     );
 }
+

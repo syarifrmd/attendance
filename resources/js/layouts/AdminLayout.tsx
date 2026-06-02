@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+﻿import { Head, Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { LayoutDashboard, ListChecks, LogOut, Menu, Users, X } from 'lucide-react';
@@ -128,3 +128,4 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
         </div>
     );
 }
+
