@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Mail, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
 
@@ -78,15 +78,28 @@ export default function VerifyNotice() {
 
                     {/* Footer */}
                     <div className="border-t border-slate-100 dark:border-slate-800">
-                        <div className="bg-slate-50 px-6 py-4 dark:bg-slate-900/50">
-                            <p className="mb-3 text-center text-xs text-slate-400">Sudah klik link?</p>
-                            <Link
-                                href="/dashboard"
-                                className="flex items-center justify-center gap-1.5 text-sm font-bold text-[#a488ea] transition-colors hover:text-[#8b6fe0] dark:text-[#b49ef5]"
-                            >
-                                Kembali ke Dashboard
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
+                        <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+                            <div className="flex-1 bg-slate-50 px-6 py-4 dark:bg-slate-900/50">
+                                <p className="mb-2 text-center text-xs text-slate-400">Sudah klik link?</p>
+                                <Link
+                                    href="/dashboard"
+                                    className="flex items-center justify-center gap-1.5 text-sm font-bold text-[#a488ea] transition-colors hover:text-[#8b6fe0] dark:text-[#b49ef5]"
+                                >
+                                    Cek Status
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
+                            </div>
+                            <div className="flex-1 bg-white px-6 py-4 dark:bg-slate-900">
+                                <p className="mb-2 text-center text-xs text-slate-400">Salah akun?</p>
+                                <Link
+                                    href="/logout"
+                                    method="post"
+                                    as="button"
+                                    className="flex w-full items-center justify-center gap-1.5 text-sm font-bold text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                                >
+                                    Ganti Akun
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
