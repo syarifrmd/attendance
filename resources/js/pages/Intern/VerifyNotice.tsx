@@ -16,78 +16,85 @@ export default function VerifyNotice() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-6">
             <Head title="Cek Email Anda" />
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <div className="rounded-full bg-blue-100 p-3">
-                        <Mail className="h-10 w-10 text-blue-600" />
-                    </div>
-                </div>
-                <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">
-                    Cek Email Anda
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    Kami telah mengirimkan link verifikasi ke email yang Anda gunakan untuk login.
-                </p>
-            </div>
+            {/* Card Container */}
+            <div className="w-full max-w-sm">
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <div className="space-y-6">
+                {/* Icon + Header */}
+                <div className="flex flex-col items-center mb-8">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-blue-400 rounded-full blur-xl opacity-20 scale-150"></div>
+                        <div className="relative bg-white rounded-full p-5 shadow-lg border border-blue-100">
+                            <Mail className="h-10 w-10 text-blue-600" />
+                        </div>
+                    </div>
+                    <h1 className="mt-6 text-2xl font-extrabold text-gray-900 tracking-tight text-center">
+                        Cek Email Anda
+                    </h1>
+                    <p className="mt-2 text-sm text-gray-500 text-center leading-relaxed px-2">
+                        Kami telah mengirimkan link verifikasi ke email yang Anda gunakan untuk login.
+                    </p>
+                </div>
+
+                {/* Card Body */}
+                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="p-6">
+
+                        {/* Success Message */}
                         {successMsg && (
-                            <div className="rounded-md bg-green-50 p-4">
-                                <div className="flex">
-                                    <div className="flex-shrink-0">
-                                        <CheckCircle2 className="h-5 w-5 text-green-400" aria-hidden="true" />
-                                    </div>
-                                    <div className="ml-3">
-                                        <h3 className="text-sm font-medium text-green-800">{successMsg}</h3>
-                                    </div>
-                                </div>
+                            <div className="mb-5 rounded-2xl bg-green-50 border border-green-100 p-4 flex gap-3 items-start">
+                                <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                                <p className="text-sm text-green-700 leading-relaxed">{successMsg}</p>
                             </div>
                         )}
 
-                        <p className="text-sm text-gray-700 text-center">
-                            Silakan buka email Anda dan klik tombol <strong>Verifikasi Akun</strong> untuk melanjutkan dan memasukkan NIM Anda.
-                        </p>
-                        
-                        <div className="mt-4 flex flex-col items-center gap-3">
-                            <p className="text-xs text-gray-500">Tidak menerima email?</p>
+                        {/* Instructions */}
+                        <div className="rounded-2xl bg-blue-50 border border-blue-100 p-4 mb-6">
+                            <p className="text-sm text-blue-800 text-center leading-relaxed">
+                                Buka email Anda dan klik tombol{' '}
+                                <span className="font-semibold text-blue-900">Verifikasi Akun</span>{' '}
+                                untuk melanjutkan dan memasukkan NIM Anda.
+                            </p>
+                        </div>
+
+                        {/* Resend Section */}
+                        <div className="flex flex-col items-center gap-3">
+                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+                                Tidak menerima email?
+                            </p>
                             <button
                                 onClick={handleResend}
                                 disabled={processing}
-                                className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gray-50 border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 hover:border-gray-300 active:scale-95 disabled:opacity-50 transition-all duration-200"
                             >
-                                <RefreshCw className={`mr-2 h-4 w-4 ${processing ? 'animate-spin' : ''}`} />
+                                <RefreshCw className={`h-4 w-4 text-gray-500 ${processing ? 'animate-spin' : ''}`} />
                                 {processing ? 'Mengirim...' : 'Kirim Ulang Email'}
                             </button>
                         </div>
-                        
-                        <div className="mt-6">
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-300" />
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="bg-white px-2 text-gray-500">
-                                        Sudah klik link?
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div className="mt-6 text-center flex flex-col gap-2">
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex justify-center items-center text-sm font-medium text-blue-600 hover:text-blue-500"
-                            >
-                                Kembali ke Dashboard <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
-                        </div>
+                    {/* Divider */}
+                    <div className="border-t border-gray-100"></div>
+
+                    {/* Footer Link */}
+                    <div className="px-6 py-4 bg-gray-50">
+                        <p className="text-xs text-center text-gray-400 mb-3">Sudah klik link?</p>
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center justify-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+                        >
+                            Kembali ke Dashboard
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
                     </div>
                 </div>
+
+                {/* Bottom hint */}
+                <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed px-4">
+                    Jika email tidak masuk, cek folder <span className="font-medium text-gray-500">Spam</span> atau hubungi admin.
+                </p>
             </div>
         </div>
     );

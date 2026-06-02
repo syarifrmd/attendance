@@ -42,9 +42,11 @@ class VerifyAccountNotification extends Notification
 
         return (new MailMessage)
             ->subject('Link Verifikasi Akun')
+            ->greeting('Halo!')
             ->line('Silakan klik tombol di bawah ini untuk memverifikasi akun Anda dan memasukkan NIM.')
             ->action('Verifikasi Akun', $url)
-            ->line('Link ini akan kedaluwarsa dalam 60 menit.');
+            ->line('Link ini akan kedaluwarsa dalam 60 menit.')
+            ->salutation("Salam hangat,\nTim Attendance");
     }
 
     /**

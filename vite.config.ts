@@ -34,9 +34,7 @@ export default defineConfig({
             outDir: 'public',
             registerType: 'autoUpdate',
             includeAssets: [
-                'favicon.ico',
-                'favicon.svg',
-                'apple-touch-icon.png',
+                'pwa-source.png',
             ],
             manifest: {
                 name: 'Intern Attendance',
@@ -50,18 +48,18 @@ export default defineConfig({
                 start_url: '/',
                 icons: [
                     {
-                        src: '/images/icon.png',
+                        src: '/pwa-source.png',
                         sizes: '512x512',
                         type: 'image/png',
                     },
                     {
-                        src: '/images/icon.png',
+                        src: '/pwa-source.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'maskable',
+                        purpose: 'any maskable',
                     },
                     {
-                        src: '/images/icon.png',
+                        src: '/pwa-source.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
