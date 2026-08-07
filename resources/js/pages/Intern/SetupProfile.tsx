@@ -1,4 +1,4 @@
-﻿import { useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import MobileLayout from '@/layouts/MobileLayout';
 import toast, { Toaster } from 'react-hot-toast';
@@ -499,11 +499,13 @@ export default function SetupProfile({
                                 autoPlay
                                 playsInline
                                 muted
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-cover [transform:scaleX(-1)]"
+                                style={{ transform: 'scaleX(-1)' }}
                             />
                             <canvas
                                 ref={overlayRef}
-                                className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+                                className="absolute inset-0 h-full w-full object-cover pointer-events-none [transform:scaleX(-1)]"
+                                style={{ transform: 'scaleX(-1)' }}
                             />
 
                             {/* Cahaya Splash Overlay */}

@@ -1,4 +1,4 @@
-﻿import { useForm, router } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import MobileLayout from '@/layouts/MobileLayout';
 import toast, { Toaster } from 'react-hot-toast';
@@ -587,8 +587,8 @@ export default function AttendanceForm({
                 {/* Camera View */}
                 {stream && !data.face_verification_image && (
                     <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-[4/3] shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
-                        <canvas ref={overlayRef} className="absolute inset-0 h-full w-full object-cover pointer-events-none" />
+                        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover [transform:scaleX(-1)]" style={{ transform: 'scaleX(-1)' }} />
+                        <canvas ref={overlayRef} className="absolute inset-0 h-full w-full object-cover pointer-events-none [transform:scaleX(-1)]" style={{ transform: 'scaleX(-1)' }} />
                         <div className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-200 ${flashEffect ? 'opacity-90' : 'opacity-0'}`} />
                         <div className="pointer-events-none absolute inset-0 ring-4 ring-white/20 ring-inset rounded-lg" />
 
