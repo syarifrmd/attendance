@@ -110,12 +110,15 @@ export default function SetupProfile({
     const getPoseFromYaw = (yawOffset: number, baseline: number) => {
         const delta = yawOffset - baseline;
 
+        // Face API reads the unmirrored camera pixels. A positive nose offset
+        // therefore means the person has turned to their left, even though the
+        // preview is mirrored for the familiar selfie-camera experience.
         if (delta > 0.08) {
-            return 'right';
+            return 'left';
         }
 
         if (delta < -0.08) {
-            return 'left';
+            return 'right';
         }
 
         if (Math.abs(delta) <= 0.05) {
@@ -692,4 +695,3 @@ export default function SetupProfile({
         </MobileLayout>
     );
 }
-
